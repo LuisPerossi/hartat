@@ -13,10 +13,24 @@ app.get('/test', () => {
   throw new ContentfulError("This is a custom error.", 400, { fatal: true })
 })
 
-
 app.post('/posts', (c) => {
   const { postController } = createDependencies(c.env.db)
   return postController.create(c)
+})
+
+app.get('/posts/:id', (c) => {
+  const { postController } = createDependencies(c.env.db)
+  return postController.getById(c)
+})
+
+app.put('/posts', (c) => {
+  const { postController } = createDependencies(c.env.db)
+  return postController.update(c)
+})
+
+app.delete('/posts/:id', (c) => {
+  const { postController } = createDependencies(c.env.db)
+  return postController.delete(c)
 })
 
 app.onError((err, c) => {
