@@ -1,5 +1,7 @@
 import { Hono } from 'hono'
 import { ContentfulError } from './error/ContentfulError'
+import { PostController } from './controller/PostController'
+import { createDependencies } from './setup/dependencies'
 
 const app = new Hono<{ Bindings: CloudflareBindings }>()
 
@@ -9,6 +11,12 @@ app.get('/', (c) => {
 
 app.get('/test', () => {
   throw new ContentfulError("This is a custom error.", 400, { fatal: true })
+})
+
+
+app.post('/posts', (c) => {
+  const { postController } = createDependencies(c.env.db)
+  return postController.create(c)
 })
 
 app.onError((err, c) => {
