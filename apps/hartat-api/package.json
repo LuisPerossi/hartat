@@ -1,0 +1,15 @@
+{
+  "name": "hartat-api",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy --minify",
+    "cf-typegen": "wrangler types ./src/types/worker-configuration.d.ts --env-interface CloudflareBindings"
+  },
+  "dependencies": {
+    "hono": "^4.13.3"
+  },
+  "devDependencies": {
+    "wrangler": "^4.110.0"
+  }
+}
