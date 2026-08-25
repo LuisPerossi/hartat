@@ -4,10 +4,13 @@
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy --minify",
-    "cf-typegen": "wrangler types ./src/types/cloudflare.d.ts --env-interface CloudflareBindings"
+    "cf-typegen": "wrangler types ./src/types/cloudflare.d.ts --env-interface CloudflareBindings",
+    "setup-database": "wrangler d1 execute hartat-database --file src/db/schema.sql"
   },
   "dependencies": {
-    "hono": "^4.13.3"
+    "@hono/zod-validator": "^0.9.0",
+    "hono": "^4.13.3",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "wrangler": "^4.110.0"

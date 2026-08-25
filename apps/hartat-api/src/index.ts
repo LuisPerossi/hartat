@@ -2,6 +2,7 @@ import { Hono } from 'hono'
 import { HonoEnv } from './types/hono'
 import { dependencies } from './dependencies'
 import { ContentfulError } from './error/ContentfulError'
+import postRouter from './router/post.router'
 
 const app = new Hono<HonoEnv>()
 
@@ -12,6 +13,9 @@ app.use(dependencies)
 app.get('/', (c) => {
   return c.text('Hello Hono!')
 })
+
+//Posts route
+app.route('/posts', postRouter)
 
 //Error handling
 app.onError((err, c) => {
