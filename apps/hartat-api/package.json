@@ -4,7 +4,7 @@
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy --minify",
-    "cf-typegen": "wrangler types ./src/types/worker-configuration.d.ts --env-interface CloudflareBindings"
+    "cf-typegen": "wrangler types ./src/types/cloudflare.d.ts --env-interface CloudflareBindings"
   },
   "dependencies": {
     "hono": "^4.13.3"
