@@ -7,5 +7,4 @@ router.post('/', (c) => {
     return c.var.dependencies.postController.create(c)
 })
 
-
 export default router

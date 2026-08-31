@@ -9,5 +9,11 @@
       "database_name": "hartat-database",
       "database_id": "073f0770-32bd-4117-9059-683babf5cfda"
     }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "bucket",
+      "bucket_name": "hartat-bucket",
+    }
   ]
 }
