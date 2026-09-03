@@ -7,13 +7,18 @@
     {
       "binding": "db",
       "database_name": "hartat-database",
-      "database_id": "073f0770-32bd-4117-9059-683babf5cfda"
+      "database_id": "073f0770-32bd-4117-9059-683babf5cfda",
+      "remote": true
     }
   ],
   "r2_buckets": [
     {
       "binding": "bucket",
       "bucket_name": "hartat-bucket",
+      "remote": true
     }
-  ]
+  ],
+  "vars": {
+    "R2_BUCKET_URL": "https://pub-6d71cdb9063b480da2ce87f884b8502a.r2.dev"
+  }
 }

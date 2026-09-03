@@ -3,8 +3,8 @@ import { HonoEnv } from "../types/hono";
 
 const router = new Hono<HonoEnv>()
 
-router.post('/', (c) => {
-    return c.var.dependencies.postController.create(c)
+router.get('/', (c) => {
+    return c.text('Hello admin route!')
 })
 
 export default router

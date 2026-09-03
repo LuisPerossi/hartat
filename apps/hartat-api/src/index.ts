@@ -2,20 +2,19 @@ import { Hono } from 'hono'
 import { HonoEnv } from './types/hono'
 import { dependencies } from './dependencies'
 import { ContentfulError } from './error/ContentfulError'
-import postRouter from './router/post.router'
+import publicRouter from './router/public.router'
+import adminRouter from './router/admin.router'
 
 const app = new Hono<HonoEnv>()
 
 //Dependencies middleware
 app.use(dependencies)
 
-//Default route
-app.get('/', (c) => {
-  return c.text('Hello Hono!')
-})
+//Admin route
+app.route('/admin', adminRouter)
 
-//Posts route
-app.route('/posts', postRouter)
+//Public route
+app.route('/', publicRouter)
 
 //Error handling
 app.onError((err, c) => {
