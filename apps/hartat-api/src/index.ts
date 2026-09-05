@@ -21,6 +21,7 @@ app.onError((err, c) => {
   if (err instanceof ContentfulError)
     return c.json({ error: err.message, data: err.data }, err.status)
 
+  console.log(err.message)
   return c.json({ error: "Internal server error" }, 500)
 })
 
