@@ -1,4 +1,5 @@
 import { ContentfulError } from "../error/ContentfulError";
+import { NotFoundError } from "../error/NotFoundError";
 import { Category } from "../model/Category";
 import { CategoryRepository } from "../repository/CategoryRepository";
 import { CreateCategory, UpdateCategory } from "../schema/category.schema";
@@ -19,7 +20,7 @@ export class CategoryService {
     public async getById(id: number) {
         const data = await this.repository.getById(id)
 
-        if (!data) { throw new ContentfulError('Category not found', 404) }
+        if (!data) { throw new NotFoundError('Category not found') }
 
         return Category.fromDatabase(data)
     }
@@ -33,7 +34,7 @@ export class CategoryService {
     public async update(id: number, updateCategory: UpdateCategory) {
         const data = await this.repository.update(id, updateCategory)
 
-        if (!data) { throw new ContentfulError('Category not found', 404) }
+        if (!data) { throw new NotFoundError('Category not found') }
 
         return Category.fromDatabase(data)
     }
@@ -41,6 +42,6 @@ export class CategoryService {
     public async delete(id: number) {
         const deleted = await this.repository.delete(id)
 
-        if (!deleted) { throw new ContentfulError('Category not found', 404) }
+        if (!deleted) { throw new NotFoundError('Category not found') }
     }
 }

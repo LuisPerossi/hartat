@@ -15,7 +15,7 @@ export class CategoryController {
 
         const category = await this.service.create(createCategory)
 
-        return c.json({ message: 'Created category', category }, 201)
+        return c.json({ message: 'Created category', data: { category } }, 201)
     }
 
     public async getById(c: Context) {
@@ -23,13 +23,13 @@ export class CategoryController {
 
         const category = await this.service.getById(id)
 
-        return c.json({ message: 'Retrieved category', category }, 200)
+        return c.json({ message: 'Retrieved category', data: { category } }, 200)
     }
 
     public async getAll(c: Context) {
         const categories = await this.service.getAll()
 
-        return c.json({ message: 'Retrieved categories', categories }, 200)
+        return c.json({ message: 'Retrieved categories', data: { categories } }, 200)
     }
 
     public async update(c: Context) {
@@ -40,7 +40,7 @@ export class CategoryController {
 
         const category = await this.service.update(id, updateCategory)
 
-        return c.json({ message: 'Updated category', category }, 200)
+        return c.json({ message: 'Updated category', data: { category } }, 200)
     }
 
     public async delete(c: Context) {
