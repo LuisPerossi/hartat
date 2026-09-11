@@ -7,7 +7,7 @@ CREATE TABLE categories(
 DROP TABLE IF EXISTS images;
 CREATE TABLE images(
     id              INTEGER         PRIMARY KEY,
-    uuid            TEXT            NOT NULL            UNIQUE,
+    key             TEXT            NOT NULL            UNIQUE,
     name            TEXT            NOT NULL,
     extension       TEXT            NOT NULL,
     uploaded_at     DATETIME        NOT NULL            DEFAULT CURRENT_TIMESTAMP

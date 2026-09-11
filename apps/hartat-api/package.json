@@ -8,6 +8,7 @@
     "setup-database": "wrangler d1 execute hartat-database --file src/db/schema.sql --remote"
   },
   "dependencies": {
+    "@cf-wasm/photon": "^0.4.0",
     "hono": "^4.13.3",
     "zod": "^4.4.3"
   },
