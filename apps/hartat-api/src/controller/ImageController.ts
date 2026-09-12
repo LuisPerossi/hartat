@@ -35,11 +35,12 @@ export class ImageController {
 
     public async getByKey(c: Context) {
         const key = c.req.param('key')
-        const preview = c.req.query('preview') === undefined ? '' : '_preview'
+        const preview = c.req.query('preview')
+        const previewMode = (preview !== undefined)
 
         if (!key) { throw new BadRequestError('Image key not provided') }
 
-        const image = await this.service.getByKey(`${key}${preview}`)
+        const image = await this.service.getByKey(key, previewMode)
 
         return c.body(image.body)
     }

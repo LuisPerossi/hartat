@@ -3,12 +3,6 @@ import * as z from 'zod'
 export type CreateImage = {
     key: string,
     name: string,
-    extension: string
-}
-
-export type ErrorImage = {
-    name: string,
-    extension: string
 }
 
 export type UpdateImage = z.infer<typeof updateImageSchema>

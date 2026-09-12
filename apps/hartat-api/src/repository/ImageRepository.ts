@@ -4,33 +4,32 @@ export type ImageRow = {
     readonly id: number,
     readonly key: string,
     readonly name: string,
-    readonly extension: string
     readonly uploaded_at: string
 }
 
 export class ImageRepository {
     constructor(private readonly db: D1Database, private readonly bucket: R2Bucket) {}
 
-    public async upload(image: File, thumbnail: Blob, data: CreateImage): Promise<ImageRow | null> {
+    public async upload(image: Blob, thumbnail: Blob, data: CreateImage) {
         try {
             await this.bucket.put(data.key, image)
-            await this.bucket.put(data.key + '_preview', thumbnail)
+            await this.bucket.put(data.key + '_thumbnail', thumbnail)
 
             const result = await this.db.prepare(`
                 INSERT INTO
-                images (key, name, extension)
-                VALUES (?, ?, ?)
-                RETURNING id, key, name, extension, uploaded_at
+                images (key, name)
+                VALUES (?, ?)
+                RETURNING id, key, name, uploaded_at
             `)
-            .bind(data.key, data.name, data.extension)
+            .bind(data.key, data.name)
             .first<ImageRow>()
 
             if (!result) { throw new Error('Unable to upload image') }
 
-            return { ...result } 
+            return result 
         } catch {
             await this.bucket.delete(data.key)
-            await this.bucket.delete(data.key + '_preview')
+            await this.bucket.delete(data.key + '_thumbnail')
             return null
         }
     }
@@ -47,7 +46,7 @@ export class ImageRepository {
 
         const { results } = await this.db
             .prepare(`
-                SELECT id, key, name, extension, uploaded_at
+                SELECT id, key, name, uploaded_at
                 FROM images
                 WHERE name LIKE ?
                 ORDER BY ${sortColumn} ${order}
@@ -62,7 +61,7 @@ export class ImageRepository {
     public async getById(id: number) {
         const result = await this.db
             .prepare(`
-                SELECT id, key, name, extension, uploaded_at 
+                SELECT id, key, name, uploaded_at 
                 FROM images
                 WHERE id = ?
             `)
@@ -78,7 +77,7 @@ export class ImageRepository {
                 UPDATE images
                 SET name = ?
                 WHERE id = ?
-                RETURNING id, key, name, extension, uploaded_at    
+                RETURNING id, key, name, uploaded_at    
             `)
             .bind(updateImage.name, id)
             .first<ImageRow>()
@@ -99,7 +98,7 @@ export class ImageRepository {
         if (!result) { return false }
 
         await this.bucket.delete(result.key)
-        await this.bucket.delete(result.key + '_preview')
+        await this.bucket.delete(result.key + '_thumbnail')
 
         return true
     }

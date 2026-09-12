@@ -5,7 +5,6 @@ export class Image {
         public readonly id: number,
         public readonly key: string,
         public name: string,
-        public extension: string,
         private readonly uploadedAt: string
     ) {}
 
@@ -18,7 +17,6 @@ export class Image {
             data.id,
             data.key,
             data.name,
-            data.extension,
             data.uploaded_at
         )
     }
@@ -28,7 +26,6 @@ export class Image {
             id: this.id,
             key: this.key,
             name: this.name,
-            extension: this.extension,
             uploadedAt: this.convertDate(this.uploadedAt)
         }
     }

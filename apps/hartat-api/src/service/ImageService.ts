@@ -1,58 +1,70 @@
-import { ImageRepository } from "../repository/ImageRepository";
-import { PhotonImage, resize, SamplingFilter } from "@cf-wasm/photon";
 import { Image } from "../model/Image";
-import { ErrorImage, GetImages, UpdateImage } from "../schema/image.schema";
+import { ImageRepository } from "../repository/ImageRepository";
+import { GetImages, UpdateImage } from "../schema/image.schema";
 import { NotFoundError } from "../error/NotFoundError";
+import { optimizeImage } from "wasm-image-optimization/workerd";
+import { PhotonImage, resize, SamplingFilter } from "@cf-wasm/photon";
 
 export class ImageService {
     constructor(private readonly repository: ImageRepository) {}
 
-    private async generateThumbnail(image: File) {
-        const inputBytes = await image.arrayBuffer().then(buffer => new Uint8Array(buffer))
-        const inputImage = PhotonImage.new_from_byteslice(inputBytes)
+    private async process(image: File) {
+        const input = new Uint8Array(await image.arrayBuffer())
+        const photonImage = PhotonImage.new_from_byteslice(input)
 
-        const target = 300
-        const width = inputImage.get_width()
-        const height = inputImage.get_height()
+        const originalWidth = photonImage.get_width()
+        const originalHeight = photonImage.get_height()
 
-        const ratio = Math.min(target / width, target / height)
-        const targetWidth = Math.round(width * ratio)
-        const targetHeight = Math.round(height * ratio)
+        const webpSize = 1920
+        const webpRatio = Math.min(1, webpSize / originalWidth, webpSize / originalHeight)
+        const webpWidth = Math.round(originalWidth * webpRatio)
 
-        const outputImage = resize(inputImage, targetWidth, targetHeight, SamplingFilter.Lanczos3)
-        const outputBytes = outputImage.get_bytes_webp()
-        
-        return new Blob([outputBytes], { type: 'image/webp' })
+        const { data: webpBytes } = await optimizeImage({ image: input, format: 'webp', width: webpWidth, quality: 80 })
+        const webp = new Blob([webpBytes], { type: 'image/webp' })
+
+        const thumbnailSize = 300
+        const thumbnailRatio = Math.min(1, thumbnailSize / originalWidth, thumbnailSize / originalHeight)
+        const thumbnailWidth = Math.round(originalWidth * thumbnailRatio)
+        const thumbnailHeight = Math.round(originalHeight * thumbnailRatio)
+
+        const photonOutput = resize(photonImage, thumbnailWidth, thumbnailHeight, SamplingFilter.Lanczos3)
+        const thumbnailBytes = photonOutput.get_bytes_webp()
+        const thumbnail = new Blob([thumbnailBytes], { type: 'image/webp' })
+
+        photonImage.free()
+        photonOutput.free()
+
+        return { webp, thumbnail }
     }
 
     public async upload(images: File[]) {
         const uploadedImages: Image[] = []
-        const errorImages: ErrorImage[] = []
+        const errorImages: string[] = []
 
         for (const image of images) {
             const data = { 
                 key: crypto.randomUUID(), 
                 name: image.name.substring(0, image.name.lastIndexOf('.')),
-                extension: image.name.substring(image.name.lastIndexOf('.'))
+                //extension: image.name.substring(image.name.lastIndexOf('.'))
             }
 
             try {
-                const thumbnail = await this.generateThumbnail(image)
-                const result = await this.repository.upload(image, thumbnail, data)
+                const { webp, thumbnail } = await this.process(image)
+                const result = await this.repository.upload(webp, thumbnail, data)
 
                 if (result === null) { throw new Error('Unable to upload image') }
 
                 uploadedImages.push(Image.fromDatabase(result))
             } catch {
-                errorImages.push({ name: data.name, extension: data.extension })
+                errorImages.push(image.name)
             }
         }
 
         return { uploadedImages, errorImages }
     }
 
-    public async getByKey(key: string) {
-        const image = await this.repository.getByKey(key)
+    public async getByKey(key: string, previewMode: boolean) {
+        const image = await this.repository.getByKey(`${key}${previewMode ? '_thumbnail' : ''}`)
 
         if (image === null) { throw new NotFoundError('Image not found') }
 

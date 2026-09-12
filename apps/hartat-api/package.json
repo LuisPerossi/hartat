@@ -10,6 +10,7 @@
   "dependencies": {
     "@cf-wasm/photon": "^0.4.0",
     "hono": "^4.13.3",
+    "wasm-image-optimization": "^2.0.10",
     "zod": "^4.4.3"
   },
   "devDependencies": {
