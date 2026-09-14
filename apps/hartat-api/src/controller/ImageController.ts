@@ -12,15 +12,10 @@ export class ImageController {
     public async upload(c: Context) {
         const body = await c.req.parseBody({ all: true })
 
-        //Filtering image files
-        const images = (Array.isArray(body.image) ? body.image : [ body.image ])
-            .filter((v): v is File => v instanceof File && v.type.startsWith('image/'))
-        
-        if (images.length === 0) { throw new BadRequestError('Image files not provided!') }
+        const files = (Array.isArray(body.image) ? body.image : [ body.image ])
+            .filter((v): v is File => v instanceof File)
 
-        if (images.length > 20) { throw new BadRequestError('Maximum of 20 images per upload reached') }
-
-        const { uploadedImages, errorImages } = await this.service.upload(images)
+        const { uploadedImages, errorImages } = await this.service.upload(files)
 
         if (uploadedImages.length === 0) {
             return c.json({ message: 'Unable to upload file(s)', data: { errorImages } }, 500)

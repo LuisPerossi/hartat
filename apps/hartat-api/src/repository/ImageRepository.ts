@@ -4,6 +4,7 @@ export type ImageRow = {
     readonly id: number,
     readonly key: string,
     readonly name: string,
+    readonly extension: string,
     readonly uploaded_at: string
 }
 
@@ -17,14 +18,12 @@ export class ImageRepository {
 
             const result = await this.db.prepare(`
                 INSERT INTO
-                images (key, name)
-                VALUES (?, ?)
-                RETURNING id, key, name, uploaded_at
+                images (key, name, extension)
+                VALUES (?, ?, ?)
+                RETURNING id, key, name, extension, uploaded_at
             `)
-            .bind(data.key, data.name)
+            .bind(data.key, data.name, data.extension)
             .first<ImageRow>()
-
-            if (!result) { throw new Error('Unable to upload image') }
 
             return result 
         } catch {
@@ -46,7 +45,7 @@ export class ImageRepository {
 
         const { results } = await this.db
             .prepare(`
-                SELECT id, key, name, uploaded_at
+                SELECT id, key, name, extension, uploaded_at
                 FROM images
                 WHERE name LIKE ?
                 ORDER BY ${sortColumn} ${order}
@@ -61,7 +60,7 @@ export class ImageRepository {
     public async getById(id: number) {
         const result = await this.db
             .prepare(`
-                SELECT id, key, name, uploaded_at 
+                SELECT id, key, name, extension, uploaded_at 
                 FROM images
                 WHERE id = ?
             `)
@@ -77,7 +76,7 @@ export class ImageRepository {
                 UPDATE images
                 SET name = ?
                 WHERE id = ?
-                RETURNING id, key, name, uploaded_at    
+                RETURNING id, key, name, extension, uploaded_at    
             `)
             .bind(updateImage.name, id)
             .first<ImageRow>()

@@ -1,63 +1,107 @@
 import { Image } from "../model/Image";
 import { ImageRepository } from "../repository/ImageRepository";
-import { GetImages, UpdateImage } from "../schema/image.schema";
+import { ErrorImage, GetImages, UpdateImage } from "../schema/image.schema";
 import { NotFoundError } from "../error/NotFoundError";
-import { optimizeImage } from "wasm-image-optimization/workerd";
-import { PhotonImage, resize, SamplingFilter } from "@cf-wasm/photon";
+import { BadRequestError } from "../error/BadRequestError";
+import { PhotonImage, resize } from "@cf-wasm/photon";
+import { imageDimensionsFromStream } from "image-dimensions";
+
+const VALID_TYPES = [ 'image/png', 'image/jpeg', 'image/webp' ]
+const MAX_FILE_SIZE = 5 * 1024 * 1024 //5Mb
+const MAX_IMAGE_PIXELS = 1920 * 1920
+const THUMBNAIL_SIZE = 300
+const errImg = ({ name, type, size }: File, cause: string): ErrorImage => ({ name, type, size, cause })
 
 export class ImageService {
     constructor(private readonly repository: ImageRepository) {}
 
-    private async process(image: File) {
-        const input = new Uint8Array(await image.arrayBuffer())
-        const photonImage = PhotonImage.new_from_byteslice(input)
+    //Thumbnail might be generated in the admin panel in the future
+    private async generateThumbnail(image: File) {
+        try {
+            const input = await image.bytes()
+            const photonInput = PhotonImage.new_from_byteslice(input)
 
-        const originalWidth = photonImage.get_width()
-        const originalHeight = photonImage.get_height()
+            const originalWidth = photonInput.get_width()
+            const originalHeight = photonInput.get_height()
 
-        const webpSize = 1920
-        const webpRatio = Math.min(1, webpSize / originalWidth, webpSize / originalHeight)
-        const webpWidth = Math.round(originalWidth * webpRatio)
+            const ratio = Math.min(1, THUMBNAIL_SIZE / originalWidth, THUMBNAIL_SIZE / originalHeight)
+            const width = Math.round(originalWidth * ratio)
+            const height = Math.round(originalHeight * ratio)
 
-        const { data: webpBytes } = await optimizeImage({ image: input, format: 'webp', width: webpWidth, quality: 80 })
-        const webp = new Blob([webpBytes], { type: 'image/webp' })
+            const photonOutput = resize(photonInput, width, height, 5)
+            const bytes = photonOutput.get_bytes_webp()
 
-        const thumbnailSize = 300
-        const thumbnailRatio = Math.min(1, thumbnailSize / originalWidth, thumbnailSize / originalHeight)
-        const thumbnailWidth = Math.round(originalWidth * thumbnailRatio)
-        const thumbnailHeight = Math.round(originalHeight * thumbnailRatio)
+            photonInput.free()
+            photonOutput.free()
 
-        const photonOutput = resize(photonImage, thumbnailWidth, thumbnailHeight, SamplingFilter.Lanczos3)
-        const thumbnailBytes = photonOutput.get_bytes_webp()
-        const thumbnail = new Blob([thumbnailBytes], { type: 'image/webp' })
-
-        photonImage.free()
-        photonOutput.free()
-
-        return { webp, thumbnail }
+            return new Blob([bytes], { type: 'image/webp' })
+        } catch {
+            return null
+        }
     }
 
-    public async upload(images: File[]) {
-        const uploadedImages: Image[] = []
-        const errorImages: string[] = []
+    public async upload(files: File[]) {
+        const images: File[] = []
+        const uploadedImages: Image[] = [] 
+        const errorImages: ErrorImage[] = []
 
+        //Validates image files with max 5Mb and 1920
+        for (const file of files) {
+            if (VALID_TYPES.includes(file.type) === false) {
+                errorImages.push(errImg(file, 'Invalid file type'))
+                continue
+            }
+
+            if (file.size > MAX_FILE_SIZE) {
+                errorImages.push(errImg(file, 'File size exceeds the 5Mb limit' ))
+                continue
+            }
+
+            const dimensions = await imageDimensionsFromStream(file.stream())
+
+            if (dimensions === undefined) {
+                errorImages.push(errImg(file, 'Unable to read image data'))
+                continue
+            }
+
+            const totalPixels = dimensions.width * dimensions.height
+
+            if (totalPixels > MAX_IMAGE_PIXELS) {
+                errorImages.push(errImg(file, `Image dimensions exceed the ${MAX_IMAGE_PIXELS}px limit`))
+                continue
+            }
+
+            images.push(file)
+        }
+
+        //If there are no valid images left, return
+        if (images.length === 0) { return { uploadedImages, errorImages }}
+
+        if (images.length > 5) { throw new BadRequestError('Maximum of 5 images per upload') }
+
+        //Proceed with upload and storage
         for (const image of images) {
-            const data = { 
+            const data = {
                 key: crypto.randomUUID(), 
                 name: image.name.substring(0, image.name.lastIndexOf('.')),
-                //extension: image.name.substring(image.name.lastIndexOf('.'))
+                extension: image.name.substring(image.name.lastIndexOf('.'))
             }
 
-            try {
-                const { webp, thumbnail } = await this.process(image)
-                const result = await this.repository.upload(webp, thumbnail, data)
+            const thumbnail = await this.generateThumbnail(image)
 
-                if (result === null) { throw new Error('Unable to upload image') }
-
-                uploadedImages.push(Image.fromDatabase(result))
-            } catch {
-                errorImages.push(image.name)
+            if (thumbnail === null) {
+                errorImages.push(errImg(image, 'Unable to generate thumbnail'))
+                continue
             }
+
+            const result = await this.repository.upload(image, thumbnail, data)
+
+            if (result === null) {
+                errorImages.push(errImg(image, 'Unable to store image, please try again'))
+                continue
+            }
+
+            uploadedImages.push(Image.fromDatabase(result))
         }
 
         return { uploadedImages, errorImages }

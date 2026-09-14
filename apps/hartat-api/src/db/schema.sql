@@ -9,6 +9,7 @@ CREATE TABLE images(
     id              INTEGER         PRIMARY KEY,
     key             TEXT            NOT NULL            UNIQUE,
     name            TEXT            NOT NULL,
+    extension       TEXT            NOT NULL,
     uploaded_at     DATETIME        NOT NULL            DEFAULT CURRENT_TIMESTAMP
 );
 
