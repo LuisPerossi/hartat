@@ -7,8 +7,12 @@ import adminRouter from './router/admin.router'
 import { NotFoundError } from './error/NotFoundError'
 import { BadRequestError } from './error/BadRequestError'
 import { ValidationError } from './error/ValidationError'
+import { cors } from 'hono/cors'
 
 const app = new Hono<HonoEnv>()
+
+//Cors for local dev
+app.use(cors({ origin: "http://localhost:5173" }))
 
 //Dependencies middleware
 app.use(dependencies)
