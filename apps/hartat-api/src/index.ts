@@ -7,8 +7,12 @@ import adminRouter from './router/admin.router'
 import { NotFoundError } from './error/NotFoundError'
 import { BadRequestError } from './error/BadRequestError'
 import { ValidationError } from './error/ValidationError'
+import { cors } from 'hono/cors'
 
 const app = new Hono<HonoEnv>()
+
+//Cors for local dev
+app.use(cors({ origin: "http://localhost:5173" }))
 
 //Dependencies middleware
 app.use(dependencies)
@@ -22,19 +26,19 @@ app.route('/', publicRouter)
 //Error handling
 app.onError((err, c) => {
   if (err instanceof BadRequestError)
-    return c.json({ error: err.message }, 400 )
+    return c.json({ message: err.message }, 400 )
 
   if (err instanceof ValidationError)
-    return c.json({ error: err.message, data: err.data }, 400)
+    return c.json({ message: err.message, data: err.data }, 400)
   
   if (err instanceof ContentfulError)
-    return c.json({ error: err.message, data: err.data }, err.status)
+    return c.json({ message: err.message, data: err.data }, err.status)
 
   if (err instanceof NotFoundError)
-    return c.json({ error: err.message }, 404)
+    return c.json({ message: err.message }, 404)
 
   console.log(err.message)
-  return c.json({ error: "Internal server error" }, 500)
+  return c.json({ message: "Internal server error" }, 500)
 })
 
 export default app
