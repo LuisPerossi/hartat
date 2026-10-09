@@ -15,17 +15,17 @@ export class ImageController {
         const files = (Array.isArray(body.image) ? body.image : [ body.image ])
             .filter((v): v is File => v instanceof File)
 
-        const { uploadedImages, errorImages } = await this.service.upload(files)
+        const { uploadedImages, failedImages } = await this.service.upload(files)
 
         if (uploadedImages.length === 0) {
-            return c.json({ message: 'Unable to upload file(s)', data: { errorImages } }, 500)
+            return c.json({ message: 'Unable to upload file(s)', data: { uploadedImages, failedImages } }, 400)
         }
 
-        if (errorImages.length > 0) {
-            return c.json({ message: 'Partially uploaded files', data: { uploadedImages, errorImages } }, 207)
+        if (failedImages.length > 0) {
+            return c.json({ message: 'Partially uploaded files', data: { uploadedImages, failedImages } }, 207)
         }
 
-        return c.json({ message: 'Uploaded file(s)', data: { uploadedImages } }, 201)
+        return c.json({ message: 'Uploaded file(s)', data: { uploadedImages, failedImages } }, 201)
     }
 
     public async getByKey(c: Context) {

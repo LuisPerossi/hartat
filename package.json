@@ -1,13 +1,11 @@
 {
   "name": "hartat",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Espaço Hartãt's website, admin panel and API",
+  "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "api": "cd ./apps/hartat-api && npm run dev",
+    "admin": "cd ./apps/hartat-admin && npm run dev"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs"
+  "workspaces": [ "apps/*", "packages/*" ],
+  "license": "GPL-3.0-only"
 }
