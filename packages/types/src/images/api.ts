@@ -1,5 +1,5 @@
-import { Pagination } from "../shared"
-import { FailedImage, Image } from "./index"
+import type { Pagination } from "../shared"
+import type { FailedImage, Image } from "./index"
 
 interface BaseApiResponse {
     message: string,
