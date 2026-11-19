@@ -2,7 +2,8 @@ import { CreateCategory, UpdateCategory } from "../schema/category.schema";
 
 export type CategoryRow = {
     readonly id: number,
-    readonly name: string
+    readonly name: string,
+    readonly post_count?: number | null
 }
 
 export class CategoryRepository {
@@ -27,9 +28,14 @@ export class CategoryRepository {
     public async getById(id: number) {
         const result = await this.db
             .prepare(`
-                SELECT id, name
-                FROM categories
-                WHERE id = ?    
+                SELECT 
+                    c.id, 
+                    c.name,
+                    COUNT(p.id) AS post_count
+                FROM categories c
+                LEFT JOIN posts p ON c.id = p.category_id
+                WHERE c.id = ?
+                GROUP BY c.id
             `)
             .bind(id)
             .first<CategoryRow>()
@@ -40,9 +46,14 @@ export class CategoryRepository {
     public async getAll() {
         const result = await this.db
             .prepare(`
-                SELECT id, name
-                FROM categories
-                ORDER BY name ASC
+                SELECT 
+                    c.id, 
+                    c.name,
+                    COUNT(p.id) AS post_count
+                FROM categories c
+                LEFT JOIN posts p ON c.id = p.category_id
+                GROUP BY c.id
+                ORDER BY c.name ASC
             `)
             .all<CategoryRow>()
         

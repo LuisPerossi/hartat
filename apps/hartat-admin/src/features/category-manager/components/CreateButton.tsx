@@ -3,11 +3,16 @@ import { createCategory } from "../utils/categories/create"
 
 interface CreateButtonProps {
     onCreated: () => void,
-    setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
+    setIsLoading: React.Dispatch<React.SetStateAction<boolean>>,
+    disabled?: boolean
 }
 
-function CreateButton({ onCreated, setIsLoading }: CreateButtonProps) {
+function CreateButton({ onCreated, setIsLoading, disabled = false }: CreateButtonProps) {
     const handleCreate = async () => {
+        if (disabled) {
+            return window.alert('Limite máximo de 20 categorias atingido')
+        }
+
         const input = window.prompt('Digite o nome da nova categoria:')
 
         if (input === null) { return }
@@ -38,7 +43,9 @@ function CreateButton({ onCreated, setIsLoading }: CreateButtonProps) {
         <button 
             type="button"
             onClick={handleCreate}
-            className="flex w-fit gap-2 px-4 py-2 items-center rounded-full text-white bg-blue-600 hover:bg-blue-700 cursor-pointer shrink-0"
+            disabled={disabled}
+            title={disabled ? "Limite máximo de 20 categorias atingido" : "Adicionar categoria"}
+            className="flex w-fit gap-2 px-4 py-2 items-center rounded-full text-white bg-blue-600 hover:bg-blue-700 cursor-pointer shrink-0 disabled:bg-gray-400 disabled:cursor-not-allowed disabled:hover:bg-gray-400"
         >
             Adicionar <PlusIcon className="text-xl" />
         </button>

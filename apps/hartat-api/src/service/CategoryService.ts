@@ -3,6 +3,7 @@ import { NotFoundError } from "../error/NotFoundError";
 import { Category } from "../model/Category";
 import { CategoryRepository } from "../repository/CategoryRepository";
 import { CreateCategory, UpdateCategory } from "../schema/category.schema";
+import { MAX_CATEGORIES } from "@hartat/types/categories";
 
 export class CategoryService {
     constructor(private readonly repository: CategoryRepository) {}
@@ -10,7 +11,7 @@ export class CategoryService {
     public async create(createCategory: CreateCategory) {
         const count = await this.repository.count()
 
-        if (count >= 20) { throw new ContentfulError('Maximum number of categories reached', 409)}
+        if (count >= MAX_CATEGORIES) { throw new ContentfulError('Maximum number of categories reached', 409)}
 
         const data = await this.repository.create(createCategory)
 
@@ -28,7 +29,7 @@ export class CategoryService {
     public async getAll() {
         const data = await this.repository.getAll()
 
-        return data.map(Category.fromDatabase)
+        return data.map(row => Category.fromDatabase(row))
     }
 
     public async update(id: number, updateCategory: UpdateCategory) {
