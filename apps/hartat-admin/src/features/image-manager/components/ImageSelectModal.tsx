@@ -1,0 +1,44 @@
+import { XIcon } from "@phosphor-icons/react"
+import type { Image } from "@hartat/types/images"
+import ImageManager from "./ImageManager"
+
+interface ImageSelectModalProps {
+    isOpen: boolean
+    onClose: () => void
+    onSelect: (image: Image) => void
+    title?: string
+}
+
+function ImageSelectModal({ isOpen, onClose, onSelect, title = "Selecionar Imagem" }: ImageSelectModalProps) {
+    if (!isOpen) return null
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 md:p-6">
+            <div className="bg-white rounded-xl shadow-2xl w-full max-w-5xl h-[85vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+                <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-gray-50">
+                    <h2 className="text-xl font-bold text-gray-800">{title}</h2>
+                    <button 
+                        type="button" 
+                        onClick={onClose} 
+                        className="p-1.5 text-gray-500 hover:text-gray-800 rounded-lg hover:bg-gray-200 cursor-pointer transition-colors"
+                        title="Fechar"
+                    >
+                        <XIcon className="text-2xl" />
+                    </button>
+                </div>
+
+                <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-3">
+                    <ImageManager 
+                        isModal 
+                        onSelectImage={(image) => {
+                            onSelect(image)
+                            onClose()
+                        }} 
+                    />
+                </div>
+            </div>
+        </div>
+    )
+}
+
+export default ImageSelectModal

@@ -1,0 +1,32 @@
+import type { Category } from "@hartat/types/categories"
+
+interface PostCategoryFilterProps {
+    categories: Category[]
+    selectedCategory?: number
+    onChange: (categoryId?: number) => void
+}
+
+function PostCategoryFilter({ categories, selectedCategory, onChange }: PostCategoryFilterProps) {
+    return (
+        <label className="flex gap-2 items-center text-sm font-medium text-gray-700">
+            Categoria:
+            <select
+                value={selectedCategory ?? ""}
+                onChange={(e) => {
+                    const val = e.target.value
+                    onChange(val === "" ? undefined : Number(val))
+                }}
+                className="rounded-md border border-gray-300 px-2 py-1.5 bg-white cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500"
+            >
+                <option value="">Todas as categorias</option>
+                {categories.map((c) => (
+                    <option key={c.id} value={c.id}>
+                        {c.name}
+                    </option>
+                ))}
+            </select>
+        </label>
+    )
+}
+
+export default PostCategoryFilter

@@ -11,10 +11,11 @@ interface ImageContainerProps {
     image: Image,
     selectedImages: Map<string, Image>,
     setSelectedImages: React.Dispatch<React.SetStateAction<Map<string, Image>>>,
-    setForceReload: React.Dispatch<React.SetStateAction<number>>
+    setForceReload: React.Dispatch<React.SetStateAction<number>>,
+    onSelectImage?: (image: Image) => void
 }
 
-function ImageContainer({ image, selectedImages, setSelectedImages, setForceReload }: ImageContainerProps) {
+function ImageContainer({ image, selectedImages, setSelectedImages, setForceReload, onSelectImage }: ImageContainerProps) {
     const imageUrl = `${API_URL}/admin/images/${image.key}`
 
     const handleCheckbox = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -100,8 +101,17 @@ function ImageContainer({ image, selectedImages, setSelectedImages, setForceRelo
                 <img 
                     src={`${imageUrl}?preview`} 
                     className="w-full aspect-square object-cover cursor-pointer" 
-                    onClick={handleClick}
+                    onClick={onSelectImage ? () => onSelectImage(image) : handleClick}
                 />
+                {onSelectImage && (
+                    <button 
+                        type="button" 
+                        onClick={() => onSelectImage(image)} 
+                        className="w-full mt-1 py-1 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded cursor-pointer transition-colors"
+                    >
+                        Selecionar
+                    </button>
+                )}
             </div>
             
             <p className="truncate" title={image.name}> { image.name } </p>
