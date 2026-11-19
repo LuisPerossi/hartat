@@ -1,24 +1,71 @@
+import { PostRow } from "../repository/PostRepository"
+
+export type PostCategory = {
+    id: number
+    name: string
+}
+
+export type PostImage = {
+    id: number
+    key: string
+    name: string
+    extension: string
+}
+
 export class Post {
     constructor(
-        public readonly id: number | null,
+        public readonly id: number,
         public title: string,
         public content: string,
-        private readonly createdAt?: string,
-        private readonly editedAt?: string
+        private readonly createdAt: string,
+        private readonly updatedAt: string,
+        public readonly categoryId: number | null,
+        public readonly imageId: number | null,
+        public readonly category?: PostCategory | null,
+        public readonly image?: PostImage | null
     ) {}
 
-    private convertDate(date: string | undefined) {
-        if (!date) { return null }
+    private convertDate(date: string) {
         return new Date(date?.replace(' ', 'T') + 'Z')
     }
-    
-    public toObject() {
+
+    public static fromDatabase(data: PostRow) {
+        const category = data.category_id && data.category_name ? {
+            id: data.category_id,
+            name: data.category_name
+        } : null
+
+        const image = data.image_id && data.image_key ? {
+            id: data.image_id,
+            key: data.image_key,
+            name: data.image_name ?? '',
+            extension: data.image_extension ?? ''
+        } : null
+
+        return new Post(
+            data.id,
+            data.title,
+            data.content,
+            data.created_at,
+            data.updated_at,
+            data.category_id ?? null,
+            data.image_id ?? null,
+            category,
+            image
+        )
+    }
+
+    public toJSON() {
         return {
             id: this.id,
             title: this.title,
             content: this.content,
             createdAt: this.convertDate(this.createdAt),
-            editedAt: this.convertDate(this.editedAt)
+            updatedAt: this.convertDate(this.updatedAt),
+            categoryId: this.categoryId,
+            imageId: this.imageId,
+            category: this.category,
+            image: this.image
         }
     }
 }
