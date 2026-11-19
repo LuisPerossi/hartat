@@ -4,6 +4,7 @@
   "private": true,
   "exports": {
     "./shared": { "types": "./src/shared/index.ts" },
-    "./images": { "types": "./src/images/index.ts" }
+    "./images": { "types": "./src/images/index.ts" },
+    "./categories": { "types": "./src/categories/index.ts" }
   }
 }
