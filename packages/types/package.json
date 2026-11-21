@@ -6,6 +6,7 @@
     "./shared": { "types": "./src/shared/index.ts", "default": "./src/shared/index.ts" },
     "./images": { "types": "./src/images/index.ts", "default": "./src/images/index.ts" },
     "./categories": { "types": "./src/categories/index.ts", "default": "./src/categories/index.ts" },
-    "./posts": { "types": "./src/posts/index.ts", "default": "./src/posts/index.ts" }
+    "./posts": { "types": "./src/posts/index.ts", "default": "./src/posts/index.ts" },
+    "./events": { "types": "./src/events/index.ts", "default": "./src/events/index.ts" }
   }
 }
