@@ -85,44 +85,38 @@ function PostManager() {
     }, [search, selectedCategory, sortOrder, page, forceReload])
 
     return (
-        <div className="flex flex-col gap-5">
+        <>
             {isLoading && <LoadingSpinner />}
 
-            <h1 className="text-2xl font-bold text-gray-800">Minhas Postagens</h1>
+            <h1 className="text-2xl font-bold">Minhas Postagens</h1>
 
-            {/* Search and Create Action */}
             <div className="flex gap-3 flex-wrap items-center">
                 <Searchbar onSearch={handleSearch} />
 
-                <Link
-                    to="/posts/new"
-                    className="flex w-fit gap-2 px-4 py-2 items-center rounded-full text-white bg-blue-600 hover:bg-blue-700 cursor-pointer shrink-0 font-medium transition-colors shadow-xs"
-                >
-                    Nova Postagem <PlusIcon className="text-xl" />
-                </Link>
-            </div>
-
-            {/* Filtering and Sorting Row */}
-            <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3 rounded-lg border border-gray-200">
                 <PostCategoryFilter
                     categories={categories}
                     selectedCategory={selectedCategory}
                     onChange={handleCategoryChange}
                 />
 
-                <PostOrderSelect onChange={handleSortOrderChange} />
+                <PostOrderSelect value={sortOrder} onChange={handleSortOrderChange} />
+
+                <Link
+                    to="/posts/new"
+                    className="flex w-fit gap-2 px-4 py-2 items-center rounded-full text-white bg-blue-600 hover:bg-blue-700 cursor-pointer shrink-0"
+                >
+                    Nova Postagem <PlusIcon className="text-xl" />
+                </Link>
             </div>
 
-            {/* Post Table */}
             <PostList
                 posts={posts}
                 onDeleted={() => setForceReload((prev) => prev + 1)}
                 setIsLoading={setIsLoading}
             />
 
-            {/* Pagination */}
             <Pagination page={page} totalPages={totalPages} onChange={setPage} />
-        </div>
+        </>
     )
 }
 

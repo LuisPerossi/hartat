@@ -1,9 +1,15 @@
 import { useEffect, useRef, useState } from "react"
 import Quill from "quill"
+import QuillResize from "quill-resize-module"
 import "quill/dist/quill.snow.css"
+import "quill-resize-module/dist/resize.css"
 import { API_URL } from "@/config/env"
 import type { Image } from "@hartat/types/images"
 import ImageSelectModal from "@/features/image-manager/components/ImageSelectModal"
+
+if (!Quill.imports["modules/resize"]) {
+    Quill.register("modules/resize", QuillResize)
+}
 
 interface QuillEditorProps {
     value: string
@@ -41,14 +47,34 @@ function QuillEditor({ value, onChange, placeholder = "Escreva o conteúdo da po
                         // Only 3 options: h1, h2, paragraph (header: false)
                         [{ header: [1, 2, false] }],
                         ["bold", "italic", "underline", "strike"],
+                        [{ align: [] }],
                         [{ list: "ordered" }, { list: "bullet" }],
-                        ["blockquote", "code-block"],
+                        ["blockquote"],
                         ["link", "image"],
                         ["clean"]
                     ],
                     handlers: {
                         image: () => {
                             setIsImageModalOpen(true)
+                        }
+                    }
+                },
+                resize: {
+                    modules: ["Resize", "DisplaySize", "Keyboard"],
+                    parchment: {
+                        image: {
+                            attribute: ["width"],
+                            limit: {
+                                minWidth: 80
+                            }
+                        }
+                    },
+                    onActive(blot: unknown) {
+                        try {
+                            const index = quill.getIndex(blot as Parameters<Quill["getIndex"]>[0])
+                            quill.setSelection(index, 1, "silent")
+                        } catch {
+                            // ignore if blot is detached
                         }
                     }
                 }
@@ -69,8 +95,8 @@ function QuillEditor({ value, onChange, placeholder = "Escreva o conteúdo da po
                 ".ql-italic": "Itálico",
                 ".ql-underline": "Sublinhado",
                 ".ql-strike": "Tachado",
+                ".ql-align": "Alinhamento",
                 ".ql-blockquote": "Citação",
-                ".ql-code-block": "Bloco de código",
                 '.ql-list[value="ordered"]': "Lista numerada",
                 '.ql-list[value="bullet"]': "Lista com marcadores",
                 ".ql-link": "Inserir link",
@@ -110,19 +136,26 @@ function QuillEditor({ value, onChange, placeholder = "Escreva o conteúdo da po
         }
     }, [value])
 
-    const handleSelectImage = (image: Image) => {
+    const handleSelectImages = (images: Image[]) => {
         const quill = quillRef.current
-        if (!quill) return
+        if (!quill || images.length === 0) return
 
         const range = quill.getSelection(true) || { index: quill.getLength(), length: 0 }
-        const imageUrl = `${API_URL}/images/${image.key}`
+        let insertIndex = range.index
 
-        quill.insertEmbed(range.index, "image", imageUrl, "user")
-        quill.setSelection(range.index + 1, 0, "user")
+        images.forEach((image) => {
+            const imageUrl = `${API_URL}/images/${image.key}`
+            quill.insertEmbed(insertIndex, "image", imageUrl, "user")
+            insertIndex += 1
+            quill.insertText(insertIndex, "\n", "user")
+            insertIndex += 1
+        })
+
+        quill.setSelection(insertIndex, 0, "user")
     }
 
     return (
-        <div className="quill-editor-wrapper flex flex-col">
+        <div className="quill-editor-wrapper flex flex-col w-full max-w-full min-w-0">
             <style>{`
                 /* Translated header dropdown in Quill Snow theme */
                 .quill-editor-wrapper .ql-snow .ql-picker.ql-header .ql-picker-label::before,
@@ -157,32 +190,49 @@ function QuillEditor({ value, onChange, placeholder = "Escreva o conteúdo da po
                     border-top-right-radius: 0.5rem;
                     border-color: #d1d5db;
                     background-color: #f9fafb;
+                    max-width: 100%;
+                    box-sizing: border-box;
                 }
                 .quill-editor-wrapper .ql-container {
                     border-bottom-left-radius: 0.5rem;
                     border-bottom-right-radius: 0.5rem;
                     border-color: #d1d5db;
+                    height: auto !important;
                     min-height: 280px;
                     font-size: 1rem;
+                    width: 100%;
+                    max-width: 100%;
+                    overflow: hidden;
+                    position: relative;
+                    box-sizing: border-box;
                 }
                 .quill-editor-wrapper .ql-editor {
                     min-height: 280px;
+                    max-height: 60vh;
+                    overflow-y: auto;
+                    overflow-x: hidden;
+                    word-break: break-word;
+                    overflow-wrap: anywhere;
+                    box-sizing: border-box;
                 }
                 .quill-editor-wrapper .ql-editor img {
                     max-width: 100%;
                     height: auto;
+                    display: inline-block;
                     border-radius: 0.375rem;
                     margin: 0.5rem 0;
+                    cursor: pointer;
                 }
             `}</style>
 
-            <div ref={editorContainerRef} />
+            <div ref={editorContainerRef} className="flex flex-col w-full max-w-full min-w-0" />
 
             <ImageSelectModal
                 isOpen={isImageModalOpen}
                 onClose={() => setIsImageModalOpen(false)}
-                onSelect={handleSelectImage}
-                title="Selecionar imagem para o texto"
+                onSelectMultiple={handleSelectImages}
+                multiple
+                title="Selecionar imagens para o texto"
             />
         </div>
     )

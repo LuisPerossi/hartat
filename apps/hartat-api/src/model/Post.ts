@@ -1,5 +1,7 @@
 import { PostRow } from "../repository/PostRepository"
 
+export type BannerAlignment = 'top' | 'center' | 'bottom'
+
 export type PostCategory = {
     id: number
     name: string
@@ -16,7 +18,9 @@ export class Post {
     constructor(
         public readonly id: number,
         public title: string,
+        public slug: string,
         public content: string,
+        public bannerAlignment: BannerAlignment,
         private readonly createdAt: string,
         private readonly updatedAt: string,
         public readonly categoryId: number | null,
@@ -42,10 +46,16 @@ export class Post {
             extension: data.image_extension ?? ''
         } : null
 
+        const alignment = data.banner_alignment === 'top' || data.banner_alignment === 'bottom'
+            ? data.banner_alignment
+            : 'center'
+
         return new Post(
             data.id,
             data.title,
+            data.slug ?? '',
             data.content,
+            alignment,
             data.created_at,
             data.updated_at,
             data.category_id ?? null,
@@ -59,7 +69,9 @@ export class Post {
         return {
             id: this.id,
             title: this.title,
+            slug: this.slug,
             content: this.content,
+            bannerAlignment: this.bannerAlignment,
             createdAt: this.convertDate(this.createdAt),
             updatedAt: this.convertDate(this.updatedAt),
             categoryId: this.categoryId,

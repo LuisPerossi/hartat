@@ -1,5 +1,6 @@
 import { Context } from "hono";
 import { PostService } from "../service/PostService";
+import { BadRequestError } from "../error/BadRequestError";
 import { idParser } from "../helper/idParser";
 import { jsonParser } from "../helper/jsonParser";
 import { validate } from "../helper/validate";
@@ -22,6 +23,17 @@ export class PostController {
         const id = idParser(c.req)
 
         const post = await this.service.getById(id)
+
+        return c.json({ message: 'Retrieved post', data: { post } }, 200)
+    }
+
+    public async getBySlug(c: Context) {
+        const slug = c.req.param('slug')
+        if (!slug) {
+            throw new BadRequestError('Invalid slug')
+        }
+
+        const post = await this.service.getBySlug(slug)
 
         return c.json({ message: 'Retrieved post', data: { post } }, 200)
     }

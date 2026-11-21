@@ -1,35 +1,44 @@
 import { Link, useNavigate } from "react-router-dom"
-import { ArrowLeftIcon, CalendarBlankIcon, PencilIcon, TagIcon } from "@phosphor-icons/react"
+import { ArrowLeftIcon, CalendarBlankIcon, ClockCounterClockwiseIcon, PencilIcon, TagIcon } from "@phosphor-icons/react"
 import { API_URL } from "@/config/env"
 import type { Post } from "@hartat/types/posts"
+import { formatDateTime, getBannerAlignmentClass, isPostModified } from "../utils/format"
 
 interface PostPreviewProps {
     post: Post
     isDraft?: boolean
+    returnTo?: string
 }
 
-function PostPreview({ post, isDraft = false }: PostPreviewProps) {
+function PostPreview({ post, isDraft = false, returnTo }: PostPreviewProps) {
     const navigate = useNavigate()
 
-    const formattedDate = post.createdAt
-        ? new Date(post.createdAt).toLocaleDateString("pt-BR", {
-              day: "numeric",
-              month: "long",
-              year: "numeric"
-          })
+    const formattedCreatedAt = post.createdAt
+        ? formatDateTime(post.createdAt)
         : "Data indisponível"
+
+    const modified = isPostModified(post.createdAt, post.updatedAt)
+    const formattedUpdatedAt = modified ? formatDateTime(post.updatedAt) : null
 
     const bannerUrl = post.image?.key
         ? `${API_URL}/images/${post.image.key}`
         : null
 
+    const handleBack = () => {
+        if (isDraft && returnTo) {
+            navigate(returnTo, { state: { draft: post }, replace: true })
+        } else {
+            navigate(-1)
+        }
+    }
+
     return (
-        <div className="flex flex-col gap-6 max-w-4xl w-full mx-auto pb-16">
+        <div className="flex flex-col gap-5 max-w-4xl w-full mx-auto pb-16">
             {/* Top Navigation Bar */}
-            <div className="flex items-center justify-between border-b border-gray-200 pb-4 flex-wrap gap-4">
+            <div className="flex items-center justify-between border-b border-gray-300 pb-4 flex-wrap gap-4">
                 <button
                     type="button"
-                    onClick={() => navigate(-1)}
+                    onClick={handleBack}
                     className="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-gray-900 cursor-pointer"
                 >
                     <ArrowLeftIcon className="text-lg" />
@@ -43,10 +52,10 @@ function PostPreview({ post, isDraft = false }: PostPreviewProps) {
                         </span>
                     )}
 
-                    {post.id > 0 && (
+                    {post.id > 0 && !isDraft && (
                         <Link
                             to={`/posts/edit/${post.id}`}
-                            className="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium cursor-pointer transition-colors shadow-xs"
+                            className="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium cursor-pointer transition-colors"
                         >
                             <PencilIcon className="text-base" />
                             Editar Postagem
@@ -56,19 +65,19 @@ function PostPreview({ post, isDraft = false }: PostPreviewProps) {
             </div>
 
             {/* Public Article Layout Preview */}
-            <article className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+            <article className="bg-white rounded-lg border border-gray-300 overflow-hidden">
                 {/* Banner Image */}
                 {bannerUrl && (
-                    <div className="w-full max-h-96 overflow-hidden bg-gray-100 border-b border-gray-100">
+                    <div className="w-full max-h-96 overflow-hidden bg-gray-100 border-b border-gray-200">
                         <img
                             src={bannerUrl}
                             alt={post.title}
-                            className="w-full h-full object-cover max-h-96"
+                            className={`w-full h-80 md:h-96 object-cover ${getBannerAlignmentClass(post.bannerAlignment)}`}
                         />
                     </div>
                 )}
 
-                <div className="p-6 md:p-10 flex flex-col gap-6">
+                <div className="p-6 md:p-10 flex flex-col gap-5">
                     {/* Meta header */}
                     <div className="flex items-center gap-4 text-sm text-gray-500 flex-wrap">
                         {post.category && (
@@ -79,20 +88,31 @@ function PostPreview({ post, isDraft = false }: PostPreviewProps) {
                         )}
                         <div className="flex items-center gap-1.5">
                             <CalendarBlankIcon className="text-base text-gray-400" />
-                            <span>{formattedDate}</span>
+                            <span>{formattedCreatedAt}</span>
                         </div>
+                        {formattedUpdatedAt && (
+                            <div className="flex items-center gap-1.5 text-gray-400">
+                                <ClockCounterClockwiseIcon className="text-base" />
+                                <span>Modificado em {formattedUpdatedAt}</span>
+                            </div>
+                        )}
                     </div>
 
-                    {/* Article Title */}
-                    <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight leading-tight">
-                        {post.title}
-                    </h1>
+                    {/* Article Title & Slug */}
+                    <div className="flex flex-col gap-1">
+                        <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight leading-tight">
+                            {post.title}
+                        </h1>
+                        {post.slug && (
+                            <span className="text-xs text-gray-400">/posts/{post.slug}</span>
+                        )}
+                    </div>
 
                     <hr className="border-gray-200" />
 
                     {/* Article Content Rendered */}
                     <div
-                        className="post-content-preview text-gray-800 text-base md:text-lg leading-relaxed flex flex-col gap-4"
+                        className="post-content-preview text-gray-800 text-base md:text-lg leading-relaxed flex flex-col gap-4 break-words"
                         dangerouslySetInnerHTML={{ __html: post.content }}
                     />
                 </div>
@@ -119,6 +139,15 @@ function PostPreview({ post, isDraft = false }: PostPreviewProps) {
                 .post-content-preview p {
                     margin-bottom: 0.75rem;
                 }
+                .post-content-preview .ql-align-center {
+                    text-align: center;
+                }
+                .post-content-preview .ql-align-right {
+                    text-align: right;
+                }
+                .post-content-preview .ql-align-justify {
+                    text-align: justify;
+                }
                 .post-content-preview a {
                     color: #2563eb;
                     text-decoration: underline;
@@ -137,15 +166,6 @@ function PostPreview({ post, isDraft = false }: PostPreviewProps) {
                     padding-bottom: 0.5rem;
                     border-radius: 0 0.375rem 0.375rem 0;
                 }
-                .post-content-preview pre {
-                    background-color: #1f2937;
-                    color: #f3f4f6;
-                    padding: 1rem;
-                    border-radius: 0.5rem;
-                    overflow-x: auto;
-                    font-family: monospace;
-                    font-size: 0.875rem;
-                }
                 .post-content-preview ul {
                     list-style-type: disc;
                     padding-left: 1.5rem;
@@ -160,8 +180,8 @@ function PostPreview({ post, isDraft = false }: PostPreviewProps) {
                     max-width: 100%;
                     height: auto;
                     border-radius: 0.5rem;
-                    margin: 1rem auto;
-                    display: block;
+                    margin: 0.75rem 0;
+                    display: inline-block;
                     box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
                 }
             `}</style>

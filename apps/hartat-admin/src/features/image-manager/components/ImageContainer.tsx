@@ -12,17 +12,19 @@ interface ImageContainerProps {
     selectedImages: Map<string, Image>,
     setSelectedImages: React.Dispatch<React.SetStateAction<Map<string, Image>>>,
     setForceReload: React.Dispatch<React.SetStateAction<number>>,
-    onSelectImage?: (image: Image) => void
+    isModal?: boolean,
+    multiple?: boolean
 }
 
-function ImageContainer({ image, selectedImages, setSelectedImages, setForceReload, onSelectImage }: ImageContainerProps) {
+function ImageContainer({ image, selectedImages, setSelectedImages, setForceReload, isModal = false, multiple = true }: ImageContainerProps) {
     const imageUrl = `${API_URL}/admin/images/${image.key}`
+    const isSelected = selectedImages.has(image.key)
 
-    const handleCheckbox = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const toggleSelection = (checked: boolean) => {
         setSelectedImages(prev => {
-            const updated = new Map(prev)
-          
-            if (e.target.checked) {
+            const updated = isModal && !multiple ? new Map<string, Image>() : new Map(prev)
+
+            if (checked) {
                 updated.set(image.key, image)
             } else {
                 updated.delete(image.key)
@@ -32,8 +34,16 @@ function ImageContainer({ image, selectedImages, setSelectedImages, setForceRelo
         })
     }
 
+    const handleCheckbox = (e: React.ChangeEvent<HTMLInputElement>) => {
+        toggleSelection(e.target.checked)
+    }
+
     const handleClick = () => {
-        window.open(imageUrl, '_blank')
+        if (isModal) {
+            toggleSelection(!isSelected)
+        } else {
+            window.open(imageUrl, '_blank')
+        }
     }
 
     const handleDownload = async () => {
@@ -100,18 +110,9 @@ function ImageContainer({ image, selectedImages, setSelectedImages, setForceRelo
 
                 <img 
                     src={`${imageUrl}?preview`} 
-                    className="w-full aspect-square object-cover cursor-pointer" 
-                    onClick={onSelectImage ? () => onSelectImage(image) : handleClick}
+                    className={`w-full aspect-square object-cover cursor-pointer transition-all ${isModal && isSelected ? 'ring-3 ring-blue-600' : ''}`} 
+                    onClick={handleClick}
                 />
-                {onSelectImage && (
-                    <button 
-                        type="button" 
-                        onClick={() => onSelectImage(image)} 
-                        className="w-full mt-1 py-1 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded cursor-pointer transition-colors"
-                    >
-                        Selecionar
-                    </button>
-                )}
             </div>
             
             <p className="truncate" title={image.name}> { image.name } </p>

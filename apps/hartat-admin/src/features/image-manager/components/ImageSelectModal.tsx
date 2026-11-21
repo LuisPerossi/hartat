@@ -5,12 +5,32 @@ import ImageManager from "./ImageManager"
 interface ImageSelectModalProps {
     isOpen: boolean
     onClose: () => void
-    onSelect: (image: Image) => void
+    onSelect?: (image: Image) => void
+    onSelectMultiple?: (images: Image[]) => void
+    multiple?: boolean
     title?: string
 }
 
-function ImageSelectModal({ isOpen, onClose, onSelect, title = "Selecionar Imagem" }: ImageSelectModalProps) {
+function ImageSelectModal({
+    isOpen,
+    onClose,
+    onSelect,
+    onSelectMultiple,
+    multiple = false,
+    title = "Selecionar Imagem"
+}: ImageSelectModalProps) {
     if (!isOpen) return null
+
+    const handleConfirm = (images: Image[]) => {
+        if (images.length === 0) return
+
+        if (multiple && onSelectMultiple) {
+            onSelectMultiple(images)
+        } else if (onSelect) {
+            onSelect(images[0])
+        }
+        onClose()
+    }
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 md:p-6">
@@ -30,10 +50,8 @@ function ImageSelectModal({ isOpen, onClose, onSelect, title = "Selecionar Image
                 <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-3">
                     <ImageManager 
                         isModal 
-                        onSelectImage={(image) => {
-                            onSelect(image)
-                            onClose()
-                        }} 
+                        multiple={multiple}
+                        onConfirmSelection={handleConfirm}
                     />
                 </div>
             </div>

@@ -1,9 +1,11 @@
 import { API_URL } from "@/config/env"
-import type { UpdatePostResponse, Post } from "@hartat/types/posts"
+import type { BannerAlignment, UpdatePostResponse, Post } from "@hartat/types/posts"
 
 interface UpdatePostParams {
     title?: string
+    slug?: string
     content?: string
+    bannerAlignment?: BannerAlignment
     categoryId?: number | null
     imageId?: number | null
 }
@@ -11,7 +13,9 @@ interface UpdatePostParams {
 export async function updatePost(id: number, params: UpdatePostParams): Promise<Post> {
     const payload: Record<string, unknown> = {}
     if (params.title !== undefined) payload.title = params.title
+    if (params.slug !== undefined) payload.slug = params.slug
     if (params.content !== undefined) payload.content = params.content
+    if (params.bannerAlignment !== undefined) payload.bannerAlignment = params.bannerAlignment
     if (params.categoryId !== undefined) payload.categoryId = params.categoryId
     if (params.imageId !== undefined) payload.imageId = params.imageId
 

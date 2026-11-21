@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import { CheckIcon } from "@phosphor-icons/react"
 
 import Searchbar from "@/components/Searchbar"
 import Pagination from "@/components/Pagination"
@@ -17,11 +18,12 @@ import { uploadImages } from "../utils/images/upload"
 import { fetchImages } from "../utils/images/fetch"
 
 interface ImageManagerProps {
-    onSelectImage?: (image: Image) => void
+    onConfirmSelection?: (images: Image[]) => void
     isModal?: boolean
+    multiple?: boolean
 }
 
-function ImageManager({ onSelectImage, isModal }: ImageManagerProps = {}) {
+function ImageManager({ onConfirmSelection, isModal = false, multiple = true }: ImageManagerProps = {}) {
     //Loading
     const [isLoading, setIsLoading] = useState(false)
 
@@ -53,7 +55,9 @@ function ImageManager({ onSelectImage, isModal }: ImageManagerProps = {}) {
         let isMounted = true
 
         const loadImages = async () => {
-            setSelectedImages(new Map())
+            if (!isModal) {
+                setSelectedImages(new Map())
+            }
             setIsLoading(true)
 
             try {
@@ -79,7 +83,7 @@ function ImageManager({ onSelectImage, isModal }: ImageManagerProps = {}) {
         return () => {
             isMounted = false
         }
-    }, [search, page, sortOrder, forceReload])
+    }, [search, page, sortOrder, forceReload, isModal])
 
     //Uploading images
     const handleUpload = async (files: File[]) => {
@@ -111,14 +115,25 @@ function ImageManager({ onSelectImage, isModal }: ImageManagerProps = {}) {
 
             { !isModal && <h1 className="text-2xl font-bold"> Minhas Imagens </h1> }
 
-            <div className="flex gap-3 flex-wrap">
+            <div className="flex gap-3 flex-wrap items-center">
                 <Searchbar onSearch={handleSearch}/>
-                <UploadButton  onSelect={handleUpload} />
+                <UploadButton onSelect={handleUpload} />
+                { isModal && onConfirmSelection && (
+                    <button
+                        type="button"
+                        disabled={selectedImages.size === 0}
+                        onClick={() => onConfirmSelection(Array.from(selectedImages.values()))}
+                        className="flex w-fit gap-2 px-4 py-2 items-center rounded-full text-white bg-emerald-600 hover:bg-emerald-700 cursor-pointer shrink-0 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed transition-colors"
+                    >
+                        Selecionar{selectedImages.size > 0 ? ` (${selectedImages.size})` : ""}
+                        <CheckIcon className="text-xl" />
+                    </button>
+                )}
             </div>
 
             <div className="flex flex-col gap-3 md:flex-row-reverse">
                 <OrderSelect onChange={handleSortOrderChange} />
-                { !onSelectImage && (
+                { !isModal && (
                     <SelectionOptions 
                         selectedImages={selectedImages} 
                         setIsLoading={setIsLoading} 
@@ -133,7 +148,8 @@ function ImageManager({ onSelectImage, isModal }: ImageManagerProps = {}) {
                     selectedImages={selectedImages} 
                     setSelectedImages={setSelectedImages} 
                     setForceReload={setForceReload} 
-                    onSelectImage={onSelectImage}
+                    isModal={isModal}
+                    multiple={multiple}
                 />
             </DropZone>
 

@@ -1,9 +1,11 @@
 import { API_URL } from "@/config/env"
-import type { CreatePostResponse, Post } from "@hartat/types/posts"
+import type { BannerAlignment, CreatePostResponse, Post } from "@hartat/types/posts"
 
 interface CreatePostParams {
     title: string
+    slug?: string
     content: string
+    bannerAlignment?: BannerAlignment
     categoryId?: number | null
     imageId?: number | null
 }
@@ -16,7 +18,9 @@ export async function createPost(params: CreatePostParams): Promise<Post> {
         },
         body: JSON.stringify({
             title: params.title,
+            ...(params.slug ? { slug: params.slug } : {}),
             content: params.content,
+            bannerAlignment: params.bannerAlignment ?? "center",
             categoryId: params.categoryId ?? null,
             imageId: params.imageId ?? null
         })

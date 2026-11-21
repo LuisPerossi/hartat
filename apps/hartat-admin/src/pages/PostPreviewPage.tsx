@@ -10,7 +10,9 @@ function PostPreviewPage() {
     const location = useLocation()
     const navigate = useNavigate()
 
-    const draft = location.state?.draft as Post | undefined
+    const locationState = location.state as { draft?: Post; returnTo?: string } | null
+    const draft = locationState?.draft
+    const returnTo = locationState?.returnTo
     const [post, setPost] = useState<Post | null>(draft || null)
     const [isLoading, setIsLoading] = useState(!draft)
 
@@ -54,7 +56,7 @@ function PostPreviewPage() {
         return null
     }
 
-    return <PostPreview post={post} isDraft={Boolean(draft)} />
+    return <PostPreview post={post} isDraft={Boolean(draft)} returnTo={returnTo} />
 }
 
 export default PostPreviewPage

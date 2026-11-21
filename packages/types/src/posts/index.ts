@@ -1,5 +1,7 @@
 export * from './api'
 
+export type BannerAlignment = 'top' | 'center' | 'bottom'
+
 export interface PostCategory {
     id: number
     name: string
@@ -15,7 +17,9 @@ export interface PostImage {
 export interface Post {
     id: number
     title: string
+    slug: string
     content: string
+    bannerAlignment: BannerAlignment
     createdAt: string
     updatedAt: string
     categoryId: number | null

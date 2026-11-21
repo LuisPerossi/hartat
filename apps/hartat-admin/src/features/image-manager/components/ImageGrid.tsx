@@ -6,10 +6,11 @@ interface ImageGridProps {
     selectedImages: Map<string, Image>,
     setSelectedImages: React.Dispatch<React.SetStateAction<Map<string, Image>>>,
     setForceReload: React.Dispatch<React.SetStateAction<number>>,
-    onSelectImage?: (image: Image) => void
+    isModal?: boolean,
+    multiple?: boolean
 }
 
-function ImageGrid({ images, selectedImages, setSelectedImages, setForceReload, onSelectImage }: ImageGridProps) {
+function ImageGrid({ images, selectedImages, setSelectedImages, setForceReload, isModal, multiple }: ImageGridProps) {
     return (
         <div className="flex-1 p-5 md:overflow-y-scroll">
             <div className="flex-1 gap-5 content-start grid grid-cols-[repeat(auto-fill,minmax(120px,1fr))]">
@@ -20,7 +21,8 @@ function ImageGrid({ images, selectedImages, setSelectedImages, setForceReload, 
                         selectedImages={selectedImages} 
                         setSelectedImages={setSelectedImages} 
                         setForceReload={setForceReload} 
-                        onSelectImage={onSelectImage}
+                        isModal={isModal}
+                        multiple={multiple}
                     />
                 ))}
             </div>

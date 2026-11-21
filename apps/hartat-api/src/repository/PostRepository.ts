@@ -3,7 +3,9 @@ import { CreatePost, GetPosts, UpdatePost } from "../schema/post.schema";
 export type PostRow = {
     readonly id: number
     readonly title: string
+    readonly slug: string | null
     readonly content: string
+    readonly banner_alignment: string | null
     readonly created_at: string
     readonly updated_at: string
     readonly category_id: number | null
@@ -17,17 +19,19 @@ export type PostRow = {
 export class PostRepository {
     constructor(private readonly db: D1Database) {}
 
-    public async create(createPost: CreatePost) {
+    public async create(createPost: CreatePost & { slug: string }) {
         const result = await this.db
             .prepare(`
                 INSERT INTO 
-                posts (title, content, category_id, image_id)
-                VALUES (?, ?, ?, ?)
+                posts (title, slug, content, banner_alignment, category_id, image_id)
+                VALUES (?, ?, ?, ?, ?, ?)
                 RETURNING id
             `)
             .bind(
                 createPost.title,
+                createPost.slug,
                 createPost.content,
+                createPost.bannerAlignment ?? 'center',
                 createPost.categoryId ?? null,
                 createPost.imageId ?? null
             )
@@ -47,7 +51,9 @@ export class PostRepository {
                 SELECT 
                     p.id, 
                     p.title, 
+                    p.slug,
                     p.content, 
+                    p.banner_alignment,
                     p.created_at, 
                     p.updated_at, 
                     p.category_id, 
@@ -67,11 +73,69 @@ export class PostRepository {
         return result
     }
 
+    public async getBySlug(slug: string) {
+        const result = await this.db
+            .prepare(`
+                SELECT 
+                    p.id, 
+                    p.title, 
+                    p.slug,
+                    p.content, 
+                    p.banner_alignment,
+                    p.created_at, 
+                    p.updated_at, 
+                    p.category_id, 
+                    p.image_id,
+                    c.name AS category_name,
+                    i.key AS image_key,
+                    i.name AS image_name,
+                    i.extension AS image_extension
+                FROM posts p
+                LEFT JOIN categories c ON p.category_id = c.id
+                LEFT JOIN images i ON p.image_id = i.id
+                WHERE p.slug = ?
+            `)
+            .bind(slug)
+            .first<PostRow>()
+
+        return result
+    }
+
+    public async slugExists(slug: string, excludeId?: number) {
+        if (excludeId !== undefined) {
+            const result = await this.db
+                .prepare(`
+                    SELECT id
+                    FROM posts
+                    WHERE slug = ? AND id != ?
+                `)
+                .bind(slug, excludeId)
+                .first<{ id: number }>()
+
+            return result !== null
+        }
+
+        const result = await this.db
+            .prepare(`
+                SELECT id
+                FROM posts
+                WHERE slug = ?
+            `)
+            .bind(slug)
+            .first<{ id: number }>()
+
+        return result !== null
+    }
+
     public async getAll(getPosts: GetPosts) {
         const { page, limit, search, categoryId, sort, order } = getPosts
 
         const offset = (page - 1) * limit
-        const sortColumn = { title: 'p.title', date: 'p.created_at' }[sort]
+        const sortColumn = {
+            title: 'p.title',
+            date: 'p.created_at',
+            updated: 'p.updated_at'
+        }[sort]
 
         const whereClauses: string[] = ['p.title LIKE ?']
         const bindings: (string | number)[] = [search ? `%${search}%` : '%']
@@ -86,7 +150,9 @@ export class PostRepository {
                 SELECT 
                     p.id, 
                     p.title, 
+                    p.slug,
                     p.content, 
+                    p.banner_alignment,
                     p.created_at, 
                     p.updated_at, 
                     p.category_id, 
@@ -140,9 +206,19 @@ export class PostRepository {
             values.push(updatePost.title)
         }
 
+        if (updatePost.slug !== undefined) {
+            fields.push('slug = ?')
+            values.push(updatePost.slug)
+        }
+
         if (updatePost.content !== undefined) {
             fields.push('content = ?')
             values.push(updatePost.content)
+        }
+
+        if (updatePost.bannerAlignment !== undefined) {
+            fields.push('banner_alignment = ?')
+            values.push(updatePost.bannerAlignment)
         }
 
         if (updatePost.categoryId !== undefined) {

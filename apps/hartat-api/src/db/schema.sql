@@ -17,7 +17,9 @@ DROP TABLE IF EXISTS posts;
 CREATE TABLE posts(
     id              INTEGER         PRIMARY KEY,
     title           TEXT            NOT NULL,
+    slug            TEXT            UNIQUE,
     content         TEXT            NOT NULL,
+    banner_alignment TEXT           NOT NULL            DEFAULT 'center',
     created_at      DATETIME        NOT NULL            DEFAULT CURRENT_TIMESTAMP,
     updated_at      DATETIME        NOT NULL            DEFAULT CURRENT_TIMESTAMP,
 
@@ -34,6 +36,8 @@ CREATE TABLE posts(
         REFERENCES images(id)
         ON DELETE SET NULL
 );
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_posts_slug ON posts(slug);
 
 DROP TABLE IF EXISTS events;
 CREATE TABLE events(

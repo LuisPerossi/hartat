@@ -4,7 +4,7 @@ import type { GetPostsResponse, GetPostResponse, Post } from "@hartat/types/post
 interface FetchPostsProps {
     search?: string
     categoryId?: number
-    sort?: 'title' | 'date'
+    sort?: 'title' | 'date' | 'updated'
     order?: 'asc' | 'desc'
     page?: number
     limit?: number
