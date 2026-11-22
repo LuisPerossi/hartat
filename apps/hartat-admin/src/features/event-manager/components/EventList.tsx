@@ -212,7 +212,7 @@ function EventList({ events, emptyMessage, onDeleted, setIsLoading }: EventListP
                                     <div className="flex flex-col min-w-0 flex-1 gap-1">
                                         <Link
                                             to={`/events/edit/${event.id}`}
-                                            className="font-medium text-gray-900 hover:text-blue-600 transition-colors leading-snug break-words"
+                                            className="font-medium text-gray-900 hover:text-blue-600 transition-colors leading-snug wrap-break-word"
                                         >
                                             {event.title}
                                         </Link>

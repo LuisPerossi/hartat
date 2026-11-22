@@ -3,15 +3,16 @@ import type { CreateCategoryResponse } from "@hartat/types/categories"
 
 interface CreateCategoryProps {
     name: string
+    color?: string
 }
 
-export async function createCategory({ name }: CreateCategoryProps) {
+export async function createCategory({ name, color }: CreateCategoryProps) {
     const response = await fetch(`${API_URL}/admin/categories`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ name })
+        body: JSON.stringify({ name, color })
     })
 
     const body = await response.json() as CreateCategoryResponse

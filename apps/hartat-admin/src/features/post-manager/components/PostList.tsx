@@ -1,9 +1,10 @@
 import { Link } from "react-router-dom"
-import { EyeIcon, ImageIcon, PencilIcon, TagIcon, TrashIcon } from "@phosphor-icons/react"
+import { EyeIcon, ImageIcon, PencilIcon, TrashIcon } from "@phosphor-icons/react"
 import { API_URL } from "@/config/env"
 import type { Post } from "@hartat/types/posts"
 import { deletePost } from "../utils/posts"
 import { formatDateTime, getBannerAlignmentClass, isPostModified } from "../utils/format"
+import CategoryBadge from "@/components/CategoryBadge"
 
 interface PostListProps {
     posts: Post[]
@@ -92,10 +93,10 @@ function PostList({ posts, onDeleted, setIsLoading }: PostListProps) {
                                         {/* Categoria */}
                                         <td className="py-3 px-4 text-gray-600 text-center whitespace-nowrap">
                                             {post.category ? (
-                                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                                    <TagIcon className="text-sm shrink-0" />
-                                                    {post.category.name}
-                                                </span>
+                                                <CategoryBadge
+                                                    name={post.category.name}
+                                                    color={post.category.color}
+                                                />
                                             ) : (
                                                 <span className="text-xs text-gray-400 italic">Sem categoria</span>
                                             )}
@@ -189,10 +190,10 @@ function PostList({ posts, onDeleted, setIsLoading }: PostListProps) {
                                         )}
                                         <div className="mt-1">
                                             {post.category ? (
-                                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                                    <TagIcon className="text-xs shrink-0" />
-                                                    {post.category.name}
-                                                </span>
+                                                <CategoryBadge
+                                                    name={post.category.name}
+                                                    color={post.category.color}
+                                                />
                                             ) : (
                                                 <span className="text-xs text-gray-400 italic">Sem categoria</span>
                                             )}

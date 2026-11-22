@@ -6,6 +6,7 @@ import type { BannerAlignment, Post } from "@hartat/types/posts"
 import type { Category } from "@hartat/types/categories"
 import type { Image } from "@hartat/types/images"
 import { fetchCategories } from "@/features/category-manager/utils/categories/fetch"
+import CategoryBadge from "@/components/CategoryBadge"
 import ImageSelectModal from "@/features/image-manager/components/ImageSelectModal"
 import LoadingSpinner from "@/components/LoadingSpinner"
 import QuillEditor from "./QuillEditor"
@@ -423,9 +424,17 @@ function PostEditor({ initialPost, draftPost, isEditing = false }: PostEditorPro
                     </div>
 
                     <div className="flex flex-col gap-1.5">
-                        <label htmlFor="post-category" className="text-sm font-semibold text-gray-700">
-                            Categoria
-                        </label>
+                        <div className="flex items-center justify-between">
+                            <label htmlFor="post-category" className="text-sm font-semibold text-gray-700">
+                                Categoria
+                            </label>
+                            {(() => {
+                                const cat = categories.find((c) => c.id === categoryId)
+                                return cat ? (
+                                    <CategoryBadge name={cat.name} color={cat.color} />
+                                ) : null
+                            })()}
+                        </div>
                         <select
                             id="post-category"
                             value={categoryId ?? ""}

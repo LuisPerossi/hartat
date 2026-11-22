@@ -64,7 +64,7 @@ function EventCardPreview({
                         {type === "special" ? "Evento Especial" : "Evento Regular"}
                     </span>
 
-                    <h3 className="text-xl font-semibold text-gray-900 leading-snug break-words">
+                    <h3 className="text-xl font-semibold text-gray-900 leading-snug wrap-break-word">
                         {title.trim() || "Nome do Evento"}
                     </h3>
                 </div>
@@ -85,7 +85,7 @@ function EventCardPreview({
                     {trimmedDescription && (
                         <div className="flex items-start gap-2">
                             <InfoIcon className="text-lg text-gray-700 shrink-0 mt-0.5" />
-                            <p className="leading-snug break-words">
+                            <p className="leading-snug wrap-break-word">
                                 <span className="font-semibold text-gray-900">Informações: </span>
                                 {trimmedDescription}
                             </p>

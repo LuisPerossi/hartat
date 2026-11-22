@@ -1,8 +1,9 @@
 import { Link, useNavigate } from "react-router-dom"
-import { ArrowLeftIcon, CalendarBlankIcon, ClockCounterClockwiseIcon, PencilIcon, TagIcon } from "@phosphor-icons/react"
+import { ArrowLeftIcon, CalendarBlankIcon, ClockCounterClockwiseIcon, PencilIcon } from "@phosphor-icons/react"
 import { API_URL } from "@/config/env"
 import type { Post } from "@hartat/types/posts"
 import { formatDateTime, getBannerAlignmentClass, isPostModified } from "../utils/format"
+import CategoryBadge from "@/components/CategoryBadge"
 
 interface PostPreviewProps {
     post: Post
@@ -81,10 +82,10 @@ function PostPreview({ post, isDraft = false, returnTo }: PostPreviewProps) {
                     {/* Meta header */}
                     <div className="flex items-center gap-4 text-sm text-gray-500 flex-wrap">
                         {post.category && (
-                            <div className="flex items-center gap-1.5 bg-blue-50 text-blue-700 font-semibold px-3 py-1 rounded-full text-xs">
-                                <TagIcon className="text-sm" />
-                                {post.category.name}
-                            </div>
+                            <CategoryBadge
+                                name={post.category.name}
+                                color={post.category.color}
+                            />
                         )}
                         <div className="flex items-center gap-1.5">
                             <CalendarBlankIcon className="text-base text-gray-400" />

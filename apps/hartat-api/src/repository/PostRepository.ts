@@ -11,6 +11,7 @@ export type PostRow = {
     readonly category_id: number | null
     readonly image_id: number | null
     readonly category_name?: string | null
+    readonly category_color?: string | null
     readonly image_key?: string | null
     readonly image_name?: string | null
     readonly image_extension?: string | null
@@ -59,6 +60,7 @@ export class PostRepository {
                     p.category_id, 
                     p.image_id,
                     c.name AS category_name,
+                    c.color AS category_color,
                     i.key AS image_key,
                     i.name AS image_name,
                     i.extension AS image_extension
@@ -87,6 +89,7 @@ export class PostRepository {
                     p.category_id, 
                     p.image_id,
                     c.name AS category_name,
+                    c.color AS category_color,
                     i.key AS image_key,
                     i.name AS image_name,
                     i.extension AS image_extension
@@ -158,6 +161,7 @@ export class PostRepository {
                     p.category_id, 
                     p.image_id,
                     c.name AS category_name,
+                    c.color AS category_color,
                     i.key AS image_key,
                     i.name AS image_name,
                     i.extension AS image_extension

@@ -5,6 +5,7 @@ export type BannerAlignment = 'top' | 'center' | 'bottom'
 export interface PostCategory {
     id: number
     name: string
+    color?: string | null
 }
 
 export interface PostImage {

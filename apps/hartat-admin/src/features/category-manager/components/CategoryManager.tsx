@@ -4,8 +4,9 @@ import LoadingSpinner from "@/components/LoadingSpinner"
 
 import CreateButton from "./CreateButton"
 import CategoryList from "./CategoryList"
+import CategoryModal from "./CategoryModal"
 import { type Category, MAX_CATEGORIES } from "@hartat/types/categories"
-import { fetchCategories } from "../utils/categories"
+import { createCategory, fetchCategories, updateCategory } from "../utils/categories"
 
 type SortField = 'name' | 'postCount'
 type SortOrder = 'asc' | 'desc'
@@ -13,10 +14,15 @@ type SortOrder = 'asc' | 'desc'
 function CategoryManager() {
     const [search, setSearch] = useState("")
     const [isLoading, setIsLoading] = useState(false)
+    const [isSaving, setIsSaving] = useState(false)
     const [categories, setCategories] = useState<Category[]>([])
     const [forceReload, setForceReload] = useState(0)
     const [sortField, setSortField] = useState<SortField>('name')
     const [sortOrder, setSortOrder] = useState<SortOrder>('asc')
+
+    // Modal state
+    const [isModalOpen, setIsModalOpen] = useState(false)
+    const [editingCategory, setEditingCategory] = useState<Category | null>(null)
 
     useEffect(() => {
         const loadCategories = async () => {
@@ -63,9 +69,50 @@ function CategoryManager() {
 
     const isLimitReached = categories.length >= MAX_CATEGORIES
 
+    const handleOpenCreate = () => {
+        if (isLimitReached) {
+            window.alert('Limite máximo de 20 categorias atingido')
+            return
+        }
+        setEditingCategory(null)
+        setIsModalOpen(true)
+    }
+
+    const handleOpenEdit = (category: Category) => {
+        setEditingCategory(category)
+        setIsModalOpen(true)
+    }
+
+    const handleSaveCategory = async (data: { name: string; color: string }) => {
+        setIsSaving(true)
+        try {
+            if (editingCategory) {
+                await updateCategory({
+                    id: editingCategory.id,
+                    name: data.name,
+                    color: data.color
+                })
+            } else {
+                await createCategory({
+                    name: data.name,
+                    color: data.color
+                })
+            }
+            setForceReload(prev => prev + 1)
+            setIsModalOpen(false)
+        } catch (err: unknown) {
+            console.error(err)
+            const message = err instanceof Error ? err.message : 'Erro ao salvar categoria'
+            window.alert(message)
+            throw err
+        } finally {
+            setIsSaving(false)
+        }
+    }
+
     return (
         <>
-            { isLoading && <LoadingSpinner /> }
+            { (isLoading || isSaving) && <LoadingSpinner /> }
 
             <h1 className="text-2xl font-bold"> Minhas Categorias </h1>
 
@@ -85,8 +132,7 @@ function CategoryManager() {
                     </select>
                 </label>
                 <CreateButton 
-                    onCreated={() => setForceReload(prev => prev + 1)} 
-                    setIsLoading={setIsLoading} 
+                    onClick={handleOpenCreate}
                     disabled={isLimitReached}
                 />
             </div>
@@ -95,10 +141,21 @@ function CategoryManager() {
                 categories={filteredCategories} 
                 totalCount={categories.length}
                 maxCategories={MAX_CATEGORIES}
-                onRenamed={() => setForceReload(prev => prev + 1)} 
+                onEdit={handleOpenEdit} 
                 onDeleted={() => setForceReload(prev => prev + 1)}
                 setIsLoading={setIsLoading} 
             />
+
+            {isModalOpen && (
+                <CategoryModal
+                    key={editingCategory?.id ?? "create"}
+                    isOpen={isModalOpen}
+                    onClose={() => setIsModalOpen(false)}
+                    onSave={handleSaveCategory}
+                    initialCategory={editingCategory}
+                    isSaving={isSaving}
+                />
+            )}
         </>
     )
 }

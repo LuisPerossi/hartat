@@ -4,6 +4,7 @@ export class Category {
     constructor(
         public readonly id: number, 
         public name: string,
+        public color: string = '#C58852',
         public readonly postCount?: number
     ) {}
 
@@ -11,6 +12,7 @@ export class Category {
         return new Category(
             data.id,
             data.name,
+            data.color ?? '#C58852',
             data.post_count !== undefined && data.post_count !== null
                 ? Number(data.post_count)
                 : 0
@@ -21,6 +23,7 @@ export class Category {
         return {
             id: this.id,
             name: this.name,
+            color: this.color,
             postCount: this.postCount ?? 0
         }
     }

@@ -1,7 +1,8 @@
 DROP TABLE IF EXISTS categories;
 CREATE TABLE categories(
     id              INTEGER         PRIMARY KEY,
-    name            TEXT            NOT NULL
+    name            TEXT            NOT NULL,
+    color           TEXT            NOT NULL            DEFAULT '#C58852'
 );
 
 DROP TABLE IF EXISTS images;

@@ -5,6 +5,7 @@ export type BannerAlignment = 'top' | 'center' | 'bottom'
 export type PostCategory = {
     id: number
     name: string
+    color?: string | null
 }
 
 export type PostImage = {
@@ -36,7 +37,8 @@ export class Post {
     public static fromDatabase(data: PostRow) {
         const category = data.category_id && data.category_name ? {
             id: data.category_id,
-            name: data.category_name
+            name: data.category_name,
+            color: data.category_color ?? null
         } : null
 
         const image = data.image_id && data.image_key ? {
