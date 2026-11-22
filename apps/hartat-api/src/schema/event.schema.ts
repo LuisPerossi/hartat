@@ -4,14 +4,17 @@ export type CreateEvent = z.infer<typeof createEventSchema>
 export type UpdateEvent = z.infer<typeof updateEventSchema>
 export type GetEvents = z.infer<typeof getEventsSchema>
 export type EventStatus = z.infer<typeof eventStatusSchema>
+export type EventType = z.infer<typeof eventTypeSchema>
 
-export const eventStatusSchema = z.enum(['upcoming', 'ongoing', 'past'])
+export const eventTypeSchema = z.enum(['regular', 'special'])
+export const eventStatusSchema = z.enum(['active', 'upcoming', 'ongoing', 'past'])
 
 const dateTimeSchema = z.iso.datetime({ offset: true })
 
 export const createEventSchema = z.object({
     title: z.string().nonempty().max(100),
-    description: z.string().nonempty(),
+    description: z.string().nullable().optional().default(''),
+    type: eventTypeSchema.optional().default('regular'),
     url: z.url().nullable().optional(),
     dateStart: dateTimeSchema,
     dateEnd: dateTimeSchema,
@@ -27,7 +30,8 @@ export const createEventSchema = z.object({
 
 export const updateEventSchema = z.object({
     title: z.string().nonempty().max(100).optional(),
-    description: z.string().nonempty().optional(),
+    description: z.string().nullable().optional(),
+    type: eventTypeSchema.optional(),
     url: z.url().nullable().optional(),
     dateStart: dateTimeSchema.optional(),
     dateEnd: dateTimeSchema.optional(),
@@ -52,6 +56,7 @@ export const updateEventSchema = z.object({
 
 export const getEventsSchema = z.object({
     search: z.string().optional(),
+    type: eventTypeSchema.optional().catch(undefined),
     status: eventStatusSchema.optional().catch(undefined),
     page: z.coerce.number().int().positive().default(1).catch(1),
     limit: z.coerce.number().int().positive().max(100).default(20).catch(20),

@@ -1,5 +1,7 @@
 import { EventRow } from "../repository/EventRepository"
 
+export type EventType = 'regular' | 'special'
+
 export type EventImage = {
     id: number
     key: string
@@ -12,6 +14,7 @@ export class Event {
         public readonly id: number,
         public title: string,
         public description: string,
+        public type: EventType,
         public url: string | null,
         private readonly dateStart: string,
         private readonly dateEnd: string,
@@ -34,10 +37,13 @@ export class Event {
             extension: data.image_extension ?? ''
         } : null
 
+        const type: EventType = data.type === 'special' ? 'special' : 'regular'
+
         return new Event(
             data.id,
             data.title,
-            data.description,
+            data.description ?? '',
+            type,
             data.url ?? null,
             data.date_start,
             data.date_end,
@@ -51,6 +57,7 @@ export class Event {
             id: this.id,
             title: this.title,
             description: this.description,
+            type: this.type,
             url: this.url,
             dateStart: this.convertDate(this.dateStart),
             dateEnd: this.convertDate(this.dateEnd),

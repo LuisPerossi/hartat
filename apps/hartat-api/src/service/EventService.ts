@@ -47,6 +47,7 @@ export class EventService {
         const data = await this.repository.getAll(getEvents)
         const count = await this.repository.count({
             search: getEvents.search,
+            type: getEvents.type,
             status: getEvents.status
         })
 

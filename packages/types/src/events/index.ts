@@ -1,6 +1,8 @@
 export * from './api'
 
-export type EventStatus = 'upcoming' | 'ongoing' | 'past'
+export type EventType = 'regular' | 'special'
+
+export type EventStatus = 'active' | 'upcoming' | 'ongoing' | 'past'
 
 export interface EventImage {
     id: number
@@ -13,6 +15,7 @@ export interface Event {
     id: number
     title: string
     description: string
+    type: EventType
     url: string | null
     dateStart: string
     dateEnd: string

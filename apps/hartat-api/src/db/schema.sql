@@ -43,7 +43,8 @@ DROP TABLE IF EXISTS events;
 CREATE TABLE events(
     id              INTEGER         PRIMARY KEY,
     title           TEXT            NOT NULL,
-    description     TEXT            NOT NULL,
+    description     TEXT                            DEFAULT '',
+    type            TEXT            NOT NULL        DEFAULT 'regular',
     url             TEXT,
     date_start      DATETIME        NOT NULL        DEFAULT CURRENT_TIMESTAMP,
     date_end        DATETIME        NOT NULL        DEFAULT CURRENT_TIMESTAMP,

@@ -1,9 +1,10 @@
-import { CreateEvent, EventStatus, GetEvents, UpdateEvent } from "../schema/event.schema";
+import { CreateEvent, EventStatus, EventType, GetEvents, UpdateEvent } from "../schema/event.schema";
 
 export type EventRow = {
     readonly id: number
     readonly title: string
-    readonly description: string
+    readonly description: string | null
+    readonly type: string | null
     readonly url: string | null
     readonly date_start: string
     readonly date_end: string
@@ -20,6 +21,8 @@ export class EventRepository {
         const prefix = alias ? `${alias}.` : ''
 
         switch (status) {
+            case 'active':
+                return `${prefix}date_end >= CURRENT_TIMESTAMP`
             case 'upcoming':
                 return `${prefix}date_start > CURRENT_TIMESTAMP`
             case 'ongoing':
@@ -35,13 +38,14 @@ export class EventRepository {
         const result = await this.db
             .prepare(`
                 INSERT INTO
-                events (title, description, url, date_start, date_end, image_id)
-                VALUES (?, ?, ?, ?, ?, ?)
+                events (title, description, type, url, date_start, date_end, image_id)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
                 RETURNING id
             `)
             .bind(
                 createEvent.title,
-                createEvent.description,
+                createEvent.description ?? '',
+                createEvent.type ?? 'regular',
                 createEvent.url ?? null,
                 createEvent.dateStart,
                 createEvent.dateEnd,
@@ -64,6 +68,7 @@ export class EventRepository {
                     e.id,
                     e.title,
                     e.description,
+                    e.type,
                     e.url,
                     e.date_start,
                     e.date_end,
@@ -82,7 +87,7 @@ export class EventRepository {
     }
 
     public async getAll(getEvents: GetEvents) {
-        const { page, limit, search, status, sort, order } = getEvents
+        const { page, limit, search, type, status, sort, order } = getEvents
 
         const offset = (page - 1) * limit
         const sortColumn = {
@@ -93,6 +98,11 @@ export class EventRepository {
 
         const whereClauses: string[] = ['e.title LIKE ?']
         const bindings: (string | number)[] = [search ? `%${search}%` : '%']
+
+        if (type !== undefined) {
+            whereClauses.push('e.type = ?')
+            bindings.push(type)
+        }
 
         const statusClause = this.buildStatusClause(status, 'e')
         if (statusClause) {
@@ -105,6 +115,7 @@ export class EventRepository {
                     e.id,
                     e.title,
                     e.description,
+                    e.type,
                     e.url,
                     e.date_start,
                     e.date_end,
@@ -124,11 +135,16 @@ export class EventRepository {
         return results
     }
 
-    public async count(filter: { search?: string, status?: EventStatus }) {
-        const { search, status } = filter
+    public async count(filter: { search?: string, type?: EventType, status?: EventStatus }) {
+        const { search, type, status } = filter
 
         const whereClauses: string[] = ['title LIKE ?']
         const bindings: (string | number)[] = [search ? `%${search}%` : '%']
+
+        if (type !== undefined) {
+            whereClauses.push('type = ?')
+            bindings.push(type)
+        }
 
         const statusClause = this.buildStatusClause(status)
         if (statusClause) {
@@ -158,7 +174,12 @@ export class EventRepository {
 
         if (updateEvent.description !== undefined) {
             fields.push('description = ?')
-            values.push(updateEvent.description)
+            values.push(updateEvent.description ?? '')
+        }
+
+        if (updateEvent.type !== undefined) {
+            fields.push('type = ?')
+            values.push(updateEvent.type)
         }
 
         if (updateEvent.url !== undefined) {

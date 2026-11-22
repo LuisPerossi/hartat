@@ -8,6 +8,8 @@ import CategoriesPage from "../pages/CategoriesPage";
 import PostsPage from "../pages/PostsPage";
 import PostEditorPage from "../pages/PostEditorPage";
 import PostPreviewPage from "../pages/PostPreviewPage";
+import EventsPage from "../pages/EventsPage";
+import EventEditorPage from "../pages/EventEditorPage";
 
 export const router = createBrowserRouter([
     { 
@@ -22,6 +24,9 @@ export const router = createBrowserRouter([
             { path: '/posts/edit', element: <PostEditorPage /> },
             { path: '/posts/edit/:id', element: <PostEditorPage /> },
             { path: '/posts/preview/:id', element: <PostPreviewPage /> },
+            { path: '/events', element: <EventsPage /> },
+            { path: '/events/new', element: <EventEditorPage /> },
+            { path: '/events/edit/:id', element: <EventEditorPage /> },
             { path: "*", element: <NotFoundPage /> }
         ],
     }
