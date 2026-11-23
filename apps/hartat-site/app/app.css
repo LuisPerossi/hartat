@@ -30,6 +30,10 @@
   --color-accent: #45a945;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 html,
 body {
   background-color: var(--color-bg);

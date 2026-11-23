@@ -1,7 +1,7 @@
 export function Footer() {
   return (
     <footer className="w-full bg-secondary text-white">
-      <div className="mx-auto flex max-w-5xl flex-col items-center gap-8 px-6 py-12 lg:flex-row lg:items-center lg:justify-between lg:gap-8 lg:px-8 lg:py-14">
+      <div className="mx-auto flex max-w-7xl flex-col items-center gap-8 px-6 py-12 lg:flex-row lg:items-center lg:justify-between lg:gap-8 lg:px-10 lg:py-14">
         {/* Logos */}
         <div className="flex flex-col items-center gap-5 lg:flex-row lg:gap-7 shrink-0">
           <img
