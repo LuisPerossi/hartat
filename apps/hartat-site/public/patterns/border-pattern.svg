@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 28" width="64" height="28" fill="none">
+  <!-- Top & bottom border rails -->
+  <line x1="0" y1="2" x2="64" y2="2" stroke="#1A0B05" stroke-width="3" />
+  <line x1="0" y1="26" x2="64" y2="26" stroke="#1A0B05" stroke-width="3" />
+
+  <!-- Main repeating zigzag -->
+  <polyline points="0,25 32,3 64,25" stroke="#1A0B05" stroke-width="3" stroke-linejoin="miter" />
+
+  <!-- Inner upward chevron -->
+  <polyline points="12,25 32,11.5 52,25" stroke="#1A0B05" stroke-width="2.6" stroke-linejoin="miter" />
+
+  <!-- Inner downward chevrons (split cleanly across tile seam x=0 / x=64) -->
+  <polyline points="0,16.5 20,3" stroke="#1A0B05" stroke-width="2.6" stroke-linejoin="miter" />
+  <polyline points="44,3 64,16.5" stroke="#1A0B05" stroke-width="2.6" stroke-linejoin="miter" />
+</svg>

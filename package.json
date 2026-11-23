@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "api": "cd ./apps/hartat-api && npm run dev",
-    "admin": "cd ./apps/hartat-admin && npm run dev"
+    "admin": "cd ./apps/hartat-admin && npm run dev",
+    "site": "cd ./apps/hartat-site && npm run dev"
   },
   "workspaces": [ "apps/*", "packages/*" ],
   "license": "GPL-3.0-only"

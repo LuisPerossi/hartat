@@ -1,0 +1,33 @@
+{
+  "name": "hartat-site",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "react-router dev",
+    "build": "react-router build",
+    "preview": "npm run build && vite preview",
+    "deploy": "npm run build && wrangler deploy",
+    "typegen": "wrangler types && react-router typegen",
+    "typecheck": "npm run typegen && tsc"
+  },
+  "dependencies": {
+    "@hartat/types": "*",
+    "@phosphor-icons/react": "^2.1.10",
+    "isbot": "^5.2.3",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "react-router": "^7.18.4"
+  },
+  "devDependencies": {
+    "@cloudflare/vite-plugin": "^1.70.1",
+    "@react-router/dev": "^7.18.4",
+    "@tailwindcss/vite": "^4.3.3",
+    "@types/node": "^24.13.6",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.7",
+    "tailwindcss": "^4.3.3",
+    "typescript": "~6.0.2",
+    "vite": "^8.3.0",
+    "wrangler": "^4.166.0"
+  }
+}
