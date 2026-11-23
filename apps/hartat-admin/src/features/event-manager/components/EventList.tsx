@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom"
-import { ArrowSquareOutIcon, CalendarBlankIcon, ImageIcon, PencilIcon, SparkleIcon, TrashIcon } from "@phosphor-icons/react"
+import { ArrowSquareOutIcon, CalendarBlankIcon, ImageIcon, PencilIcon, TrashIcon } from "@phosphor-icons/react"
 import { API_URL } from "@/config/env"
 import type { Event } from "@hartat/types/events"
 import { deleteEvent } from "../utils/events"
@@ -132,8 +132,7 @@ function EventList({ events, emptyMessage, onDeleted, setIsLoading }: EventListP
 
                                         {/* Tipo */}
                                         <td className="py-3 px-4 text-center whitespace-nowrap">
-                                            <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${typeBadge.className}`}>
-                                                {event.type === "special" && <SparkleIcon className="text-xs shrink-0" />}
+                                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${typeBadge.className}`}>
                                                 {typeBadge.label}
                                             </span>
                                         </td>
@@ -236,18 +235,19 @@ function EventList({ events, emptyMessage, onDeleted, setIsLoading }: EventListP
                                 </div>
 
                                 <div className="flex items-center justify-between gap-2 pt-2 border-t border-gray-100">
-                                    <div className="flex flex-wrap items-center gap-2 text-xs text-gray-600">
+                                    <div className="flex flex-col gap-1.5 text-xs text-gray-600">
                                         <span className="inline-flex items-center gap-1">
                                             <CalendarBlankIcon className="text-sm shrink-0" />
                                             {formatEventSchedule(event.dateStart, event.dateEnd)}
                                         </span>
-                                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${typeBadge.className}`}>
-                                            {event.type === "special" && <SparkleIcon className="text-xs shrink-0" />}
-                                            {typeBadge.label}
-                                        </span>
-                                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${statusBadge.className}`}>
-                                            {statusBadge.label}
-                                        </span>
+                                        <div className="flex flex-wrap items-center gap-1.5">
+                                            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${typeBadge.className}`}>
+                                                {typeBadge.label}
+                                            </span>
+                                            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${statusBadge.className}`}>
+                                                {statusBadge.label}
+                                            </span>
+                                        </div>
                                     </div>
 
                                     <div className="flex items-center gap-1 shrink-0">

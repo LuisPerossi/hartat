@@ -242,17 +242,17 @@ function EventEditor({ initialEvent, isEditing = false }: EventEditorProps) {
         <div className="flex flex-col gap-5 max-w-5xl w-full min-w-0 mx-auto pb-12">
             {isLoading && <LoadingSpinner />}
 
-            <div className="flex items-center justify-between flex-wrap gap-3">
-                <div className="flex items-center gap-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex items-center gap-2 sm:gap-3">
                     <button
                         type="button"
                         onClick={() => navigate("/events")}
-                        className="p-2 rounded-full hover:bg-gray-200 text-gray-700 cursor-pointer transition-colors"
+                        className="p-2 rounded-full hover:bg-gray-200 text-gray-700 cursor-pointer transition-colors shrink-0"
                         title="Voltar para eventos"
                     >
                         <ArrowLeftIcon className="text-xl" />
                     </button>
-                    <h1 className="text-2xl font-bold">
+                    <h1 className="text-xl sm:text-2xl font-bold truncate">
                         {isEditing ? "Editar Evento" : "Novo Evento"}
                     </h1>
                 </div>
@@ -260,10 +260,10 @@ function EventEditor({ initialEvent, isEditing = false }: EventEditorProps) {
                 <button
                     type="button"
                     onClick={handleSubmit}
-                    className="flex items-center gap-2 px-5 py-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-medium cursor-pointer transition-colors"
+                    className="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-medium cursor-pointer transition-colors text-sm sm:text-base whitespace-nowrap"
                 >
-                    <FloppyDiskIcon className="text-lg" />
-                    {isEditing ? "Salvar Alterações" : "Criar Evento"}
+                    <FloppyDiskIcon className="text-lg shrink-0" />
+                    <span>{isEditing ? "Salvar Alterações" : "Criar Evento"}</span>
                 </button>
             </div>
 
@@ -314,15 +314,15 @@ function EventEditor({ initialEvent, isEditing = false }: EventEditorProps) {
                     ) : (
                         <div
                             onClick={() => setIsCoverModalOpen(true)}
-                            className="border-2 border-dashed border-gray-300 hover:border-blue-500 hover:bg-blue-50/30 rounded-lg p-8 flex flex-col items-center justify-center gap-2 cursor-pointer transition-colors"
+                            className="border-2 border-dashed border-gray-300 hover:border-blue-500 hover:bg-blue-50/30 rounded-lg p-6 sm:p-8 flex flex-col items-center justify-center gap-2 cursor-pointer transition-colors text-center"
                         >
                             <div className="p-3 bg-gray-100 rounded-full text-gray-600">
                                 <ImageIcon className="text-3xl" />
                             </div>
-                            <span className="font-medium text-gray-700">
+                            <span className="font-medium text-gray-700 text-center">
                                 Clique para definir uma imagem de capa
                             </span>
-                            <span className="text-xs text-gray-500">
+                            <span className="text-xs text-gray-500 text-center">
                                 Escolha entre as imagens cadastradas no sistema
                             </span>
                         </div>
@@ -351,7 +351,7 @@ function EventEditor({ initialEvent, isEditing = false }: EventEditorProps) {
                             />
                             <div className="flex flex-col">
                                 <span className="text-sm font-semibold text-gray-900">
-                                    Evento Regular / Diário
+                                    Evento Regular
                                 </span>
                                 <span className="text-xs text-gray-500">
                                     Acontece em um único dia, com horário opcional.
@@ -401,7 +401,7 @@ function EventEditor({ initialEvent, isEditing = false }: EventEditorProps) {
                         maxLength={100}
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
-                        placeholder="Ex: Exposição de Arte Contemporânea"
+                        placeholder="Digite o nome do evento..."
                         className="w-full px-3 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500 text-gray-800 font-medium"
                         required
                     />
@@ -594,26 +594,17 @@ function EventEditor({ initialEvent, isEditing = false }: EventEditorProps) {
                                 : "border-gray-300 focus:ring-blue-500"
                         }`}
                     />
-                    {urlError ? (
+                    {urlError && (
                         <span className="text-xs text-red-600 font-medium">{urlError}</span>
-                    ) : (
-                        <span className="text-xs text-gray-500">
-                            Adicione um link para a página do evento, postagem do blog ou inscrição.
-                        </span>
                     )}
                 </div>
             </form>
 
             {/* Live Card Preview (centered) */}
             <div className="flex flex-col items-center gap-4 bg-gray-50 p-5 md:p-6 rounded-lg border border-gray-300">
-                <div className="flex flex-col items-center gap-0.5 text-center">
-                    <h2 className="text-sm font-semibold text-gray-700">
-                        Pré-visualização do Cartão
-                    </h2>
-                    <span className="text-xs text-gray-500">
-                        Veja como o evento será exibido no site público.
-                    </span>
-                </div>
+                <h2 className="text-sm font-semibold text-gray-700 text-center">
+                    Pré-visualização do cartão
+                </h2>
 
                 <EventCardPreview
                     title={title}

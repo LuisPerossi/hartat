@@ -1,4 +1,4 @@
-import { CalendarBlankIcon, ImageIcon, InfoIcon, LinkIcon, SparkleIcon } from "@phosphor-icons/react"
+import { CalendarBlankIcon, ImageIcon, InfoIcon, LinkIcon } from "@phosphor-icons/react"
 import { API_URL } from "@/config/env"
 import type { EventType } from "@hartat/types/events"
 import { formatDisplayUrl, formatEventScheduleFromInputs } from "../utils/format"
@@ -54,13 +54,12 @@ function EventCardPreview({
             <div className="flex flex-col gap-3 p-5 flex-1 min-w-0 justify-center">
                 <div className="flex flex-col gap-1.5">
                     <span
-                        className={`inline-flex items-center gap-1 w-fit px-2 py-0.5 rounded-full text-xs font-medium ${
+                        className={`inline-flex items-center w-fit px-2 py-0.5 rounded-full text-xs font-medium ${
                             type === "special"
                                 ? "bg-amber-100 text-amber-800"
                                 : "bg-slate-100 text-slate-700"
                         }`}
                     >
-                        {type === "special" && <SparkleIcon className="text-xs shrink-0" />}
                         {type === "special" ? "Evento Especial" : "Evento Regular"}
                     </span>
 

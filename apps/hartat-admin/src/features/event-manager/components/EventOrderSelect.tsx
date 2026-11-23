@@ -12,12 +12,12 @@ function EventOrderSelect({ value, onChange: setSortOrder }: EventOrderSelectPro
     }
 
     return (
-        <label className="flex gap-2 items-center text-sm font-medium text-gray-700">
-            Ordenar:
+        <label className="flex w-full md:w-auto gap-2 items-center text-sm font-medium text-gray-700 min-w-0">
+            <span className="shrink-0">Ordenar:</span>
             <select
                 value={`${value.sort}-${value.order}`}
                 onChange={handleChange}
-                className="rounded-md border border-gray-300 px-2 py-1.5 bg-white cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="flex-1 md:flex-initial w-full md:w-auto min-w-0 rounded-md border border-gray-300 px-2.5 py-1.5 bg-white cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
             >
                 <option value="dateStart-asc">Data de início (mais próximos)</option>
                 <option value="dateStart-desc">Data de início (mais distantes)</option>

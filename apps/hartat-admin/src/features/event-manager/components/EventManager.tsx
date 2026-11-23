@@ -113,16 +113,22 @@ function EventManager() {
             <div className="flex gap-3 flex-wrap items-center">
                 <Searchbar onSearch={handleSearch} />
 
-                <EventTypeFilter selectedType={selectedType} onChange={handleTypeChange} />
-
-                <EventOrderSelect value={sortOrder} onChange={handleSortOrderChange} />
-
                 <Link
                     to="/events/new"
                     className="flex w-fit gap-2 px-4 py-2 items-center rounded-full text-white bg-blue-600 hover:bg-blue-700 cursor-pointer shrink-0"
                 >
                     Novo Evento <PlusIcon className="text-xl" />
                 </Link>
+            </div>
+
+            <div className="flex flex-col gap-2.5 sm:gap-3 md:flex-row md:items-center md:justify-between">
+                <div className="w-full md:w-auto">
+                    <EventTypeFilter selectedType={selectedType} onChange={handleTypeChange} />
+                </div>
+
+                <div className="w-full md:w-auto md:ml-auto">
+                    <EventOrderSelect value={sortOrder} onChange={handleSortOrderChange} />
+                </div>
             </div>
 
             {/* Section Tabs: Upcoming/Active vs Archived */}
@@ -137,7 +143,7 @@ function EventManager() {
                     }`}
                 >
                     <CalendarBlankIcon className="text-lg" />
-                    Próximos Eventos
+                    Próximos
                     {activeCount !== null && (
                         <span
                             className={`px-2 py-0.5 rounded-full text-xs ${
