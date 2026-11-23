@@ -1,17 +1,23 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router";
+import { CaretDownIcon } from "@phosphor-icons/react/dist/ssr/CaretDown";
 import { CaretRightIcon } from "@phosphor-icons/react/dist/ssr/CaretRight";
 import { ListIcon } from "@phosphor-icons/react/dist/ssr/List";
 import { XIcon } from "@phosphor-icons/react/dist/ssr/X";
+import { normalizeCategoryKey } from "@/lib/format";
 
-const NAV_ITEMS = [
+const PRIMARY_NAV_ITEMS = [
   { label: "Início", to: "/", end: true },
   { label: "Sobre", to: "/sobre" },
   { label: "Programação", to: "/programacao" },
-  { label: "Projetos", to: "/postagens?categoria=projetos" },
-  { label: "Acervo", to: "/postagens?categoria=acervo" },
-  { label: "Cine Hartãt", to: "/postagens?categoria=cine-hartat" },
-  { label: "Intercâmbios", to: "/postagens?categoria=intercambios" },
+] as const;
+
+const POST_SUB_ITEMS = [
+  { label: "Acervo", category: "Acervo" },
+  { label: "Blog", category: "Blog" },
+  { label: "Cinema", category: "Cinema" },
+  { label: "Eventos", category: "Eventos" },
+  { label: "Exposições", category: "Exposições" },
 ] as const;
 
 const SOCIAL_LINKS = [
@@ -68,12 +74,232 @@ function VerticalPatternStrip() {
   );
 }
 
-export function Sidebar() {
-  const [menuOpen, setMenuOpen] = useState(false);
+interface SidebarNavProps {
+  mode: "desktop" | "mobile";
+  postsOpen: boolean;
+  onTogglePosts: () => void;
+  itemPaddingClass: string;
+  itemWeightClass: string;
+}
+
+function SidebarNav({
+  mode,
+  postsOpen,
+  onTogglePosts,
+  itemPaddingClass,
+  itemWeightClass,
+}: SidebarNavProps) {
   const location = useLocation();
+  const isOnPostsRoute = location.pathname.startsWith("/postagens");
+  const activeCategoryKeys = new Set(
+    new URLSearchParams(location.search)
+      .getAll("categoria")
+      .flatMap((v) => v.split(","))
+      .map(normalizeCategoryKey)
+      .filter(Boolean),
+  );
+  const isPostsRootActive =
+    location.pathname === "/postagens" && activeCategoryKeys.size === 0;
+
+  return (
+    <ul className="divide-y divide-[#9A6A40]">
+      {PRIMARY_NAV_ITEMS.map((item) => (
+        <li key={item.label}>
+          <NavLink
+            to={item.to}
+            end={"end" in item ? item.end : false}
+            className={({ isActive }) =>
+              [
+                `group flex items-center justify-between rounded-sm px-2 ${itemPaddingClass} text-lg ${itemWeightClass} transition-colors`,
+                isActive
+                  ? "bg-[#46140A] text-white"
+                  : "text-black hover:bg-[#46140A] hover:text-white",
+              ].join(" ")
+            }
+          >
+            {({ isActive }) => (
+              <>
+                <span>{item.label}</span>
+                <CaretRightIcon
+                  size={18}
+                  weight="bold"
+                  aria-hidden="true"
+                  className={[
+                    "shrink-0 transition-colors",
+                    isActive
+                      ? "text-white"
+                      : "text-[#46140A] group-hover:text-white",
+                  ].join(" ")}
+                />
+              </>
+            )}
+          </NavLink>
+        </li>
+      ))}
+
+      {/* Postagens with hover-reveal on desktop and tap-toggle on mobile */}
+      {mode === "desktop" ? (
+        <li className="group/posts">
+          <Link
+            to="/postagens"
+            className={[
+              `group flex items-center justify-between rounded-sm px-2 ${itemPaddingClass} text-lg ${itemWeightClass} transition-colors`,
+              isPostsRootActive
+                ? "bg-[#46140A] text-white"
+                : "text-black hover:bg-[#46140A] hover:text-white",
+            ].join(" ")}
+          >
+            <span>Postagens</span>
+            <CaretDownIcon
+              size={18}
+              weight="bold"
+              aria-hidden="true"
+              className={[
+                "shrink-0 transition-all duration-200 group-hover/posts:rotate-180 group-focus-within/posts:rotate-180",
+                isPostsRootActive
+                  ? "text-white"
+                  : "text-[#46140A] group-hover:text-white",
+              ].join(" ")}
+            />
+          </Link>
+
+          <div className="grid grid-rows-[0fr] transition-[grid-template-rows] duration-200 ease-out group-hover/posts:grid-rows-[1fr] group-focus-within/posts:grid-rows-[1fr]">
+            <div className="overflow-hidden">
+              <ul className="mt-1 mb-2 ml-3 space-y-0.5 border-l-2 border-[#9A6A40]/80 pl-2.5">
+                {POST_SUB_ITEMS.map((sub) => {
+                  const isSubActive =
+                    isOnPostsRoute &&
+                    activeCategoryKeys.size === 1 &&
+                    activeCategoryKeys.has(normalizeCategoryKey(sub.category));
+
+                  return (
+                    <li key={sub.category}>
+                      <Link
+                        to={`/postagens?categoria=${encodeURIComponent(sub.category)}`}
+                        className={[
+                          "group flex items-center justify-between rounded-sm px-2 py-2 text-base transition-colors",
+                          isSubActive
+                            ? "bg-[#46140A] font-medium text-white"
+                            : "text-black/90 hover:bg-[#46140A] hover:text-white",
+                        ].join(" ")}
+                      >
+                        <span>{sub.label}</span>
+                        <CaretRightIcon
+                          size={15}
+                          weight="bold"
+                          aria-hidden="true"
+                          className={[
+                            "shrink-0 transition-colors",
+                            isSubActive
+                              ? "text-white"
+                              : "text-[#46140A] group-hover:text-white",
+                          ].join(" ")}
+                        />
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          </div>
+        </li>
+      ) : (
+        <li>
+          <div
+            className={[
+              "group flex items-center justify-between rounded-sm transition-colors",
+              isPostsRootActive
+                ? "bg-[#46140A] text-white"
+                : "text-black hover:bg-[#46140A] hover:text-white",
+            ].join(" ")}
+          >
+            <Link
+              to="/postagens"
+              className={`flex-1 px-2 ${itemPaddingClass} text-lg ${itemWeightClass}`}
+            >
+              Postagens
+            </Link>
+            <button
+              type="button"
+              onClick={onTogglePosts}
+              aria-expanded={postsOpen}
+              aria-label={
+                postsOpen
+                  ? "Recolher categorias de postagens"
+                  : "Expandir categorias de postagens"
+              }
+              className={`flex cursor-pointer items-center justify-center px-2 ${itemPaddingClass}`}
+            >
+              <CaretDownIcon
+                size={18}
+                weight="bold"
+                aria-hidden="true"
+                className={[
+                  "shrink-0 transition-transform duration-200",
+                  postsOpen ? "rotate-180" : "",
+                  isPostsRootActive
+                    ? "text-white"
+                    : "text-[#46140A] group-hover:text-white",
+                ].join(" ")}
+              />
+            </button>
+          </div>
+
+          {postsOpen && (
+            <ul className="mt-1 mb-2 ml-3 space-y-0.5 border-l-2 border-[#9A6A40]/80 pl-2.5">
+              {POST_SUB_ITEMS.map((sub) => {
+                const isSubActive =
+                  isOnPostsRoute &&
+                  activeCategoryKeys.size === 1 &&
+                  activeCategoryKeys.has(normalizeCategoryKey(sub.category));
+
+                return (
+                  <li key={sub.category}>
+                    <Link
+                      to={`/postagens?categoria=${encodeURIComponent(sub.category)}`}
+                      className={[
+                        "group flex items-center justify-between rounded-sm px-2 py-2 text-base transition-colors",
+                        isSubActive
+                          ? "bg-[#46140A] font-medium text-white"
+                          : "text-black/90 hover:bg-[#46140A] hover:text-white",
+                      ].join(" ")}
+                    >
+                      <span>{sub.label}</span>
+                      <CaretRightIcon
+                        size={15}
+                        weight="bold"
+                        aria-hidden="true"
+                        className={[
+                          "shrink-0 transition-colors",
+                          isSubActive
+                            ? "text-white"
+                            : "text-[#46140A] group-hover:text-white",
+                        ].join(" ")}
+                      />
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </li>
+      )}
+    </ul>
+  );
+}
+
+export function Sidebar() {
+  const location = useLocation();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [postsOpen, setPostsOpen] = useState(() =>
+    location.pathname.startsWith("/postagens"),
+  );
 
   useEffect(() => {
     setMenuOpen(false);
+    if (location.pathname.startsWith("/postagens")) {
+      setPostsOpen(true);
+    }
   }, [location.pathname, location.search]);
 
   return (
@@ -113,44 +339,13 @@ export function Sidebar() {
             className="absolute inset-x-0 top-full max-h-[calc(100vh-4.75rem)] overflow-y-auto bg-primary shadow-xl"
           >
             <nav aria-label="Navegação principal" className="px-5 pt-2 pb-4">
-              <ul className="divide-y divide-[#9A6A40]">
-                {NAV_ITEMS.map((item) => (
-                  <li key={item.label}>
-                    <NavLink
-                      to={item.to}
-                      end={"end" in item ? item.end : false}
-                      className={({ isActive }) =>
-                        [
-                          "group flex items-center justify-between rounded-sm px-2 py-3.5 text-lg font-medium transition-colors",
-                          isActive && !item.to.includes("?")
-                            ? "bg-[#46140A] text-white"
-                            : "text-black hover:bg-[#46140A] hover:text-white",
-                        ].join(" ")
-                      }
-                    >
-                      {({ isActive }) => {
-                        const active = isActive && !item.to.includes("?");
-                        return (
-                          <>
-                            <span>{item.label}</span>
-                            <CaretRightIcon
-                              size={18}
-                              weight="bold"
-                              aria-hidden="true"
-                              className={[
-                                "shrink-0 transition-colors",
-                                active
-                                  ? "text-white"
-                                  : "text-[#46140A] group-hover:text-white",
-                              ].join(" ")}
-                            />
-                          </>
-                        );
-                      }}
-                    </NavLink>
-                  </li>
-                ))}
-              </ul>
+              <SidebarNav
+                mode="mobile"
+                postsOpen={postsOpen}
+                onTogglePosts={() => setPostsOpen((prev) => !prev)}
+                itemPaddingClass="py-3.5"
+                itemWeightClass="font-medium"
+              />
             </nav>
 
             <div className="flex items-center justify-center gap-5 px-5 pb-5">
@@ -198,44 +393,13 @@ export function Sidebar() {
 
             {/* Navigation */}
             <nav aria-label="Navegação principal" className="mt-8">
-              <ul className="divide-y divide-[#9A6A40]">
-                {NAV_ITEMS.map((item) => (
-                  <li key={item.label}>
-                    <NavLink
-                      to={item.to}
-                      end={"end" in item ? item.end : false}
-                      className={({ isActive }) =>
-                        [
-                          "group flex items-center justify-between rounded-sm px-2 py-2.5 text-lg font-normal transition-colors",
-                          isActive && !item.to.includes("?")
-                            ? "bg-[#46140A] text-white"
-                            : "text-black hover:bg-[#46140A] hover:text-white",
-                        ].join(" ")
-                      }
-                    >
-                      {({ isActive }) => {
-                        const active = isActive && !item.to.includes("?");
-                        return (
-                          <>
-                            <span>{item.label}</span>
-                            <CaretRightIcon
-                              size={18}
-                              weight="bold"
-                              aria-hidden="true"
-                              className={[
-                                "shrink-0 transition-colors",
-                                active
-                                  ? "text-white"
-                                  : "text-[#46140A] group-hover:text-white",
-                              ].join(" ")}
-                            />
-                          </>
-                        );
-                      }}
-                    </NavLink>
-                  </li>
-                ))}
-              </ul>
+              <SidebarNav
+                mode="desktop"
+                postsOpen={postsOpen}
+                onTogglePosts={() => setPostsOpen((prev) => !prev)}
+                itemPaddingClass="py-2.5"
+                itemWeightClass="font-normal"
+              />
             </nav>
           </div>
 

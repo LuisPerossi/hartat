@@ -18,21 +18,12 @@ import {
 
 const PAGE_LIMIT = 12;
 
-export function meta({ loaderData }: Route.MetaArgs) {
-  const activeCategories = loaderData?.activeCategories ?? [];
-  const label =
-    activeCategories.length === 1 ? activeCategories[0].name : null;
-  const title = label
-    ? `${label} — Postagens — Espaço Hartãt`
-    : "Postagens — Espaço Hartãt";
-
+export function meta({}: Route.MetaArgs) {
   return [
-    { title },
+    { title: "Postagens — Espaço Hartãt" },
     {
       name: "description",
-      content: label
-        ? `Publicações da categoria ${label} no Espaço Hartãt.`
-        : "Notícias, exposições, projetos e artigos do Espaço Hartãt.",
+      content: "Notícias, exposições, projetos e artigos do Espaço Hartãt.",
     },
   ];
 }

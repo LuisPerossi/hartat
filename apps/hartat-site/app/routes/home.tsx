@@ -121,7 +121,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
             </Link>
 
             <Link
-              to="/postagens?categoria=acervo"
+              to="/postagens?categoria=Acervo"
               className="flex items-center justify-center gap-3 rounded-2xl bg-secondary px-6 py-4 text-lg font-medium text-white shadow-sm transition-colors hover:bg-secondary/90"
             >
               <ImageIcon size={26} weight="regular" aria-hidden="true" />
