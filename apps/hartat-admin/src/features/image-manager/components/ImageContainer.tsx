@@ -93,29 +93,55 @@ function ImageContainer({ image, selectedImages, setSelectedImages, setForceRelo
 
     return (
         <div>
-            <div className="relative group cursor-pointer">
-                <div className="absolute inset-0 flex justify-between pointer-events-none *:group-hover:block *:md:hidden">
-                    <input 
-                        type="checkbox" 
-                        onChange={handleCheckbox} 
-                        checked={selectedImages.has(image.key)} 
-                        className="self-end size-6 pointer-events-auto cursor-pointer checked:block"
-                    /> 
-                    <div className="text-xl divide-x divide-black/25 *:cursor-pointer *:pointer-events-auto">
-                        <button children={<DownloadIcon />} onClick={handleDownload} className="p-1 bg-gray-300 hover:bg-gray-400" />
-                        <button children={<PencilIcon />} onClick={handleRename} className="p-1 bg-gray-300 hover:bg-gray-400" />
-                        <button children={<TrashIcon />} onClick={handleDelete} className="p-1 bg-gray-300 hover:bg-gray-400" />
+            <div
+                className={`relative group cursor-pointer rounded-md overflow-hidden border bg-gray-100 transition-all ${
+                    isSelected ? "border-blue-600 ring-2 ring-blue-600" : "border-gray-200 hover:border-gray-300"
+                }`}
+            >
+                <div className="absolute inset-0 pointer-events-none">
+                    <input
+                        type="checkbox"
+                        onChange={handleCheckbox}
+                        checked={isSelected}
+                        className="absolute bottom-1.5 left-1.5 size-5 shrink-0 accent-blue-600 pointer-events-auto cursor-pointer md:hidden group-hover:block checked:block"
+                    />
+                    <div className="absolute top-1.5 right-1.5 flex items-start gap-1 md:hidden group-hover:flex *:pointer-events-auto">
+                        <button
+                            type="button"
+                            title="Baixar imagem"
+                            onClick={handleDownload}
+                            className="p-1.5 rounded-sm bg-gray-200/90 hover:bg-gray-300 text-gray-700 cursor-pointer transition-colors"
+                        >
+                            <DownloadIcon className="text-base" />
+                        </button>
+                        <button
+                            type="button"
+                            title="Renomear imagem"
+                            onClick={handleRename}
+                            className="p-1.5 rounded-sm bg-gray-200/90 hover:bg-gray-300 text-gray-700 cursor-pointer transition-colors"
+                        >
+                            <PencilIcon className="text-base" />
+                        </button>
+                        <button
+                            type="button"
+                            title="Excluir imagem"
+                            onClick={handleDelete}
+                            className="p-1.5 rounded-sm bg-gray-200/90 hover:bg-gray-300 text-gray-700 cursor-pointer transition-colors"
+                        >
+                            <TrashIcon className="text-base" />
+                        </button>
                     </div>
                 </div>
 
-                <img 
-                    src={`${imageUrl}?preview`} 
-                    className={`w-full aspect-square object-cover cursor-pointer transition-all ${isModal && isSelected ? 'ring-3 ring-blue-600' : ''}`} 
+                <img
+                    src={`${imageUrl}?preview`}
+                    alt={image.name}
+                    className="w-full aspect-square object-cover cursor-pointer block"
                     onClick={handleClick}
                 />
             </div>
-            
-            <p className="truncate" title={image.name}> { image.name } </p>
+
+            <p className="mt-1 text-sm text-gray-700 truncate" title={image.name}>{image.name}</p>
         </div>
     )
 }

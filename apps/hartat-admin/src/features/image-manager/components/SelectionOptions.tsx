@@ -62,18 +62,42 @@ function SelectionOptions({ selectedImages, setIsLoading, setForceReload }: Sele
         }
     }
 
-    return (
-        <div className="flex flex-wrap items-center justify-between gap-3 md:justify-start">
-            <p> Selecionados: </p>
+    const selectedCount = selectedImages.size
 
-            <div className="flex gap-3 *:cursor-pointer">
-                <button className="flex items-center gap-2 rounded-full bg-gray-300 px-3 py-1" onClick={handleDownloadAll}>
-                    Baixar <DownloadIcon />
+    return (
+        <div className="flex w-full flex-wrap items-center justify-between gap-2 md:w-auto md:justify-start md:gap-3">
+            <div className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                <span>Selecionados:</span>
+                <span
+                    className={`px-2 py-0.5 rounded-full text-xs ${
+                        selectedCount > 0
+                            ? "bg-blue-100 text-blue-700"
+                            : "bg-gray-200 text-gray-700"
+                    }`}
+                >
+                    {selectedCount}
+                </span>
+            </div>
+
+            <div className="flex items-center gap-2">
+                <button
+                    type="button"
+                    disabled={selectedCount === 0}
+                    onClick={handleDownloadAll}
+                    className="flex items-center gap-1.5 rounded-md border border-gray-300 bg-white hover:bg-gray-100 text-gray-700 px-3 py-1.5 text-sm font-medium cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white"
+                >
+                    <DownloadIcon className="text-base" />
+                    Baixar
                 </button>
 
-                <button className="flex items-center gap-2 rounded-full bg-gray-300 px-3 py-1" onClick={handleDeleteAll}>
+                <button
+                    type="button"
+                    disabled={selectedCount === 0}
+                    onClick={handleDeleteAll}
+                    className="flex items-center gap-1.5 rounded-md border border-gray-300 bg-white hover:bg-red-50 hover:text-red-700 hover:border-red-300 text-gray-700 px-3 py-1.5 text-sm font-medium cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:text-gray-700 disabled:hover:border-gray-300"
+                >
+                    <TrashIcon className="text-base" />
                     Excluir
-                    <TrashIcon />
                 </button>
             </div>
         </div>

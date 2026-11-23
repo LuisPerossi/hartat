@@ -232,7 +232,6 @@ function QuillEditor({ value, onChange, placeholder = "Escreva o conteúdo da po
                 onClose={() => setIsImageModalOpen(false)}
                 onSelectMultiple={handleSelectImages}
                 multiple
-                title="Selecionar imagens para o texto"
             />
         </div>
     )

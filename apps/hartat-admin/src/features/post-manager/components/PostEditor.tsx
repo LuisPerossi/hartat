@@ -517,7 +517,6 @@ function PostEditor({ initialPost, draftPost, isEditing = false }: PostEditorPro
                 isOpen={isBannerModalOpen}
                 onClose={() => setIsBannerModalOpen(false)}
                 onSelect={handleSelectBanner}
-                title="Selecionar Banner da Postagem"
             />
         </div>
     )

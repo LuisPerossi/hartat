@@ -42,15 +42,15 @@ function DropZone({ children, onDrop: handleUpload }: DropZoneProps) {
     }
 
     const overlay = (
-        <div className="absolute flex inset-0 z-50 flex-col items-center justify-center text-white bg-black/30">
+        <div className="absolute flex inset-0 z-50 flex-col items-center justify-center text-white bg-black/40 rounded-lg">
             <CloudArrowUpIcon className="text-6xl" />
-            <p className="text-xl" > Arraste imagens para enviar. </p>
+            <p className="text-xl font-medium">Arraste imagens para enviar.</p>
         </div>
     )
 
     return (
         <div 
-            className="relative flex flex-1" 
+            className="relative flex flex-1 min-h-0" 
             onDragOver={handleDragOver} 
             onDragEnter={handleDragEnter} 
             onDragLeave={handleDragLeave} 

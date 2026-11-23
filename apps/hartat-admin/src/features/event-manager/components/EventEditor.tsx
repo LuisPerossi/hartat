@@ -633,7 +633,6 @@ function EventEditor({ initialEvent, isEditing = false }: EventEditorProps) {
                 isOpen={isCoverModalOpen}
                 onClose={() => setIsCoverModalOpen(false)}
                 onSelect={handleSelectCover}
-                title="Selecionar Capa do Evento"
             />
         </div>
     )

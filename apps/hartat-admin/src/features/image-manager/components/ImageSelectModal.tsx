@@ -8,7 +8,6 @@ interface ImageSelectModalProps {
     onSelect?: (image: Image) => void
     onSelectMultiple?: (images: Image[]) => void
     multiple?: boolean
-    title?: string
 }
 
 function ImageSelectModal({
@@ -16,10 +15,11 @@ function ImageSelectModal({
     onClose,
     onSelect,
     onSelectMultiple,
-    multiple = false,
-    title = "Selecionar Imagem"
+    multiple = false
 }: ImageSelectModalProps) {
     if (!isOpen) return null
+
+    const title = multiple ? "Selecionar Imagens" : "Selecionar Imagem"
 
     const handleConfirm = (images: Image[]) => {
         if (images.length === 0) return
