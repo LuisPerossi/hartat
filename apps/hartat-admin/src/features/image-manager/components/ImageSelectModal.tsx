@@ -33,10 +33,10 @@ function ImageSelectModal({
     }
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 md:p-6">
-            <div className="bg-white rounded-xl shadow-2xl w-full max-w-5xl h-[85vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-                <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-gray-50">
-                    <h2 className="text-xl font-bold text-gray-800">{title}</h2>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-2 sm:p-4 md:p-6">
+            <div className="bg-white rounded-xl shadow-2xl w-full max-w-5xl h-[92dvh] md:h-[85vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+                <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 bg-gray-50 shrink-0">
+                    <h2 className="text-lg sm:text-xl font-bold text-gray-800">{title}</h2>
                     <button 
                         type="button" 
                         onClick={onClose} 
@@ -47,7 +47,7 @@ function ImageSelectModal({
                     </button>
                 </div>
 
-                <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-3">
+                <div className="flex-1 min-h-0 overflow-hidden p-3 sm:p-6 flex flex-col gap-3">
                     <ImageManager 
                         isModal 
                         multiple={multiple}

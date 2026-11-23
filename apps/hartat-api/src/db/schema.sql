@@ -21,6 +21,7 @@ CREATE TABLE posts(
     slug            TEXT            UNIQUE,
     content         TEXT            NOT NULL,
     banner_alignment TEXT           NOT NULL            DEFAULT 'center',
+    is_highlighted  INTEGER         NOT NULL            DEFAULT 0,
     created_at      DATETIME        NOT NULL            DEFAULT CURRENT_TIMESTAMP,
     updated_at      DATETIME        NOT NULL            DEFAULT CURRENT_TIMESTAMP,
 
@@ -39,6 +40,7 @@ CREATE TABLE posts(
 );
 
 CREATE UNIQUE INDEX IF NOT EXISTS idx_posts_slug ON posts(slug);
+CREATE INDEX IF NOT EXISTS idx_posts_highlighted ON posts(is_highlighted);
 
 DROP TABLE IF EXISTS events;
 CREATE TABLE events(

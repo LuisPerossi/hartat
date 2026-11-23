@@ -6,6 +6,7 @@ interface CreatePostParams {
     slug?: string
     content: string
     bannerAlignment?: BannerAlignment
+    isHighlighted?: boolean
     categoryId?: number | null
     imageId?: number | null
 }
@@ -21,6 +22,7 @@ export async function createPost(params: CreatePostParams): Promise<Post> {
             ...(params.slug ? { slug: params.slug } : {}),
             content: params.content,
             bannerAlignment: params.bannerAlignment ?? "center",
+            isHighlighted: Boolean(params.isHighlighted),
             categoryId: params.categoryId ?? null,
             imageId: params.imageId ?? null
         })

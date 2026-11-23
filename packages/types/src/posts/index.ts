@@ -21,6 +21,8 @@ export interface Post {
     slug: string
     content: string
     bannerAlignment: BannerAlignment
+    isHighlighted: boolean
+    excerpt?: string
     createdAt: string
     updatedAt: string
     categoryId: number | null

@@ -12,7 +12,7 @@ interface ImageGridProps {
 
 function ImageGrid({ images, selectedImages, setSelectedImages, setForceReload, isModal, multiple }: ImageGridProps) {
     return (
-        <div className="flex-1 p-4 border border-gray-300 rounded-lg bg-white md:overflow-y-auto">
+        <div className="flex-1 min-h-0 p-4 border border-gray-300 rounded-lg bg-white overflow-y-auto">
             {images.length === 0 ? (
                 <div className="py-12 text-center text-gray-500">
                     Nenhuma imagem encontrada

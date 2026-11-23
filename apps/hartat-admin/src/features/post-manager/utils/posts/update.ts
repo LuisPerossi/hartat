@@ -6,6 +6,7 @@ interface UpdatePostParams {
     slug?: string
     content?: string
     bannerAlignment?: BannerAlignment
+    isHighlighted?: boolean
     categoryId?: number | null
     imageId?: number | null
 }
@@ -16,6 +17,7 @@ export async function updatePost(id: number, params: UpdatePostParams): Promise<
     if (params.slug !== undefined) payload.slug = params.slug
     if (params.content !== undefined) payload.content = params.content
     if (params.bannerAlignment !== undefined) payload.bannerAlignment = params.bannerAlignment
+    if (params.isHighlighted !== undefined) payload.isHighlighted = params.isHighlighted
     if (params.categoryId !== undefined) payload.categoryId = params.categoryId
     if (params.imageId !== undefined) payload.imageId = params.imageId
 

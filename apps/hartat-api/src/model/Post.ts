@@ -22,6 +22,7 @@ export class Post {
         public slug: string,
         public content: string,
         public bannerAlignment: BannerAlignment,
+        public isHighlighted: boolean,
         private readonly createdAt: string,
         private readonly updatedAt: string,
         public readonly categoryId: number | null,
@@ -32,6 +33,17 @@ export class Post {
 
     private convertDate(date: string) {
         return new Date(date?.replace(' ', 'T') + 'Z')
+    }
+
+    public extractExcerpt(maxLength = 160): string {
+        const text = this.content
+            .replace(/<[^>]*>/g, ' ')
+            .replace(/&nbsp;/g, ' ')
+            .replace(/&[a-z0-9#]+;/gi, ' ')
+            .replace(/\s+/g, ' ')
+            .trim()
+        if (text.length <= maxLength) return text
+        return text.slice(0, maxLength).trim() + '...'
     }
 
     public static fromDatabase(data: PostRow) {
@@ -58,6 +70,7 @@ export class Post {
             data.slug ?? '',
             data.content,
             alignment,
+            Boolean(data.is_highlighted),
             data.created_at,
             data.updated_at,
             data.category_id ?? null,
@@ -74,6 +87,8 @@ export class Post {
             slug: this.slug,
             content: this.content,
             bannerAlignment: this.bannerAlignment,
+            isHighlighted: this.isHighlighted,
+            excerpt: this.extractExcerpt(),
             createdAt: this.convertDate(this.createdAt),
             updatedAt: this.convertDate(this.updatedAt),
             categoryId: this.categoryId,

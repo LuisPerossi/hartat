@@ -10,6 +10,7 @@ export interface PostFormData {
     slug: string
     content: string
     bannerAlignment: BannerAlignment
+    isHighlighted: boolean
     categoryId: number | null
     imageId: number | null
 }

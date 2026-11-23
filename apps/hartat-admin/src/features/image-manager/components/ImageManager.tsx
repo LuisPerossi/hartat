@@ -115,20 +115,24 @@ function ImageManager({ onConfirmSelection, isModal = false, multiple = true }: 
 
             { !isModal && <h1 className="text-2xl font-bold">Minhas Imagens</h1> }
 
-            <div className="flex gap-3 flex-wrap items-center">
+            <div className="flex gap-2.5 sm:gap-3 flex-wrap items-center">
                 <Searchbar onSearch={handleSearch} />
-                <UploadButton onSelect={handleUpload} />
-                { isModal && onConfirmSelection && (
-                    <button
-                        type="button"
-                        disabled={selectedImages.size === 0}
-                        onClick={() => onConfirmSelection(Array.from(selectedImages.values()))}
-                        className="flex w-fit gap-2 px-4 py-2 items-center rounded-full text-white bg-emerald-600 hover:bg-emerald-700 cursor-pointer shrink-0 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed transition-colors"
-                    >
-                        Selecionar{multiple && selectedImages.size > 0 ? ` (${selectedImages.size})` : ""}
-                        <CheckIcon className="text-xl" />
-                    </button>
-                )}
+                <div className={`flex items-center gap-2 ${isModal ? "w-full sm:w-auto" : ""}`}>
+                    <div className="shrink-0">
+                        <UploadButton onSelect={handleUpload} />
+                    </div>
+                    { isModal && onConfirmSelection && (
+                        <button
+                            type="button"
+                            disabled={selectedImages.size === 0}
+                            onClick={() => onConfirmSelection(Array.from(selectedImages.values()))}
+                            className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2 rounded-full text-white bg-emerald-600 hover:bg-emerald-700 cursor-pointer disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed transition-colors text-sm sm:text-base font-medium whitespace-nowrap"
+                        >
+                            <span>Selecionar{multiple && selectedImages.size > 0 ? ` (${selectedImages.size})` : ""}</span>
+                            <CheckIcon className="text-xl shrink-0" />
+                        </button>
+                    )}
+                </div>
             </div>
 
             <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">

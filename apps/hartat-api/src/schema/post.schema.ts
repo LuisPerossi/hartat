@@ -18,6 +18,7 @@ export const createPostSchema = z.object({
     slug: slugSchema.optional(),
     content: z.string().nonempty(),
     bannerAlignment: bannerAlignmentSchema.optional().default('center'),
+    isHighlighted: z.boolean().optional().default(false),
     categoryId: z.number().int().positive().nullable().optional(),
     imageId: z.number().int().positive().nullable().optional()
 })
@@ -27,6 +28,7 @@ export const updatePostSchema = z.object({
     slug: slugSchema.optional(),
     content: z.string().nonempty().optional(),
     bannerAlignment: bannerAlignmentSchema.optional(),
+    isHighlighted: z.boolean().optional(),
     categoryId: z.number().int().positive().nullable().optional(),
     imageId: z.number().int().positive().nullable().optional()
 })
@@ -38,6 +40,10 @@ export const updatePostSchema = z.object({
 export const getPostsSchema = z.object({
     search: z.string().optional(),
     categoryId: z.coerce.number().int().positive().optional(),
+    isHighlighted: z.preprocess(
+        val => val === 'true' || val === true ? true : val === 'false' || val === false ? false : undefined,
+        z.boolean().optional()
+    ),
     page: z.coerce.number().int().positive().default(1).catch(1),
     limit: z.coerce.number().int().positive().max(100).default(20).catch(20),
     sort: z.enum(['title', 'date', 'updated']).default('date').catch('date'),

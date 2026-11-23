@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
-import { PlusIcon } from "@phosphor-icons/react"
+import { PlusIcon, StarIcon } from "@phosphor-icons/react"
 import Searchbar from "@/components/Searchbar"
 import Pagination from "@/components/Pagination"
 import LoadingSpinner from "@/components/LoadingSpinner"
@@ -21,6 +21,7 @@ function PostManager() {
     // Filters and pagination
     const [search, setSearch] = useState("")
     const [selectedCategory, setSelectedCategory] = useState<number | undefined>(undefined)
+    const [highlightedFilter, setHighlightedFilter] = useState<boolean | undefined>(undefined)
     const [sortOrder, setSortOrder] = useState<SortOrder>({ sort: "date", order: "desc" })
     const [page, setPage] = useState(1)
     const [totalPages, setTotalPages] = useState(1)
@@ -65,6 +66,7 @@ function PostManager() {
                 const { posts, pagination } = await fetchPosts({
                     search,
                     categoryId: selectedCategory,
+                    isHighlighted: highlightedFilter,
                     sort: sortOrder.sort,
                     order: sortOrder.order,
                     page,
@@ -82,7 +84,7 @@ function PostManager() {
         }
 
         loadPosts()
-    }, [search, selectedCategory, sortOrder, page, forceReload])
+    }, [search, selectedCategory, highlightedFilter, sortOrder, page, forceReload])
 
     return (
         <>
@@ -93,20 +95,48 @@ function PostManager() {
             <div className="flex gap-3 flex-wrap items-center">
                 <Searchbar onSearch={handleSearch} />
 
-                <PostCategoryFilter
-                    categories={categories}
-                    selectedCategory={selectedCategory}
-                    onChange={handleCategoryChange}
-                />
-
-                <PostOrderSelect value={sortOrder} onChange={handleSortOrderChange} />
-
                 <Link
                     to="/posts/new"
                     className="flex w-fit gap-2 px-4 py-2 items-center rounded-full text-white bg-blue-600 hover:bg-blue-700 cursor-pointer shrink-0"
                 >
                     Nova Postagem <PlusIcon className="text-xl" />
                 </Link>
+            </div>
+
+            <div className="flex flex-col gap-2.5 sm:gap-3 md:flex-row md:items-center md:justify-between">
+                <div className="flex items-center gap-2 w-full md:w-auto">
+                    <div className="flex-1 md:flex-initial min-w-0">
+                        <PostCategoryFilter
+                            categories={categories}
+                            selectedCategory={selectedCategory}
+                            onChange={handleCategoryChange}
+                        />
+                    </div>
+
+                    <button
+                        type="button"
+                        onClick={() => {
+                            setHighlightedFilter((prev) => (prev ? undefined : true))
+                            setPage(1)
+                        }}
+                        className={`flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-md border text-sm font-medium cursor-pointer transition-colors shrink-0 ${
+                            highlightedFilter
+                                ? "bg-amber-100 border-amber-300 text-amber-800"
+                                : "bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
+                        }`}
+                        title={highlightedFilter ? "Mostrando apenas destaques" : "Filtrar por postagens em destaque"}
+                    >
+                        <StarIcon
+                            weight={highlightedFilter ? "fill" : "regular"}
+                            className={highlightedFilter ? "text-amber-500 text-base" : "text-gray-500 text-base"}
+                        />
+                        Destaques
+                    </button>
+                </div>
+
+                <div className="w-full md:w-auto md:ml-auto">
+                    <PostOrderSelect value={sortOrder} onChange={handleSortOrderChange} />
+                </div>
             </div>
 
             <PostList

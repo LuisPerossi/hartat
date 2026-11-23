@@ -1,12 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from "react"
 import { useBlocker, useNavigate } from "react-router-dom"
-import { ArrowClockwiseIcon, ArrowLeftIcon, EyeIcon, FloppyDiskIcon, ImageIcon, TrashIcon } from "@phosphor-icons/react"
+import { ArrowClockwiseIcon, ArrowLeftIcon, EyeIcon, FloppyDiskIcon, ImageIcon, QuestionIcon, StarIcon, TrashIcon } from "@phosphor-icons/react"
 import { API_URL } from "@/config/env"
 import type { BannerAlignment, Post } from "@hartat/types/posts"
 import type { Category } from "@hartat/types/categories"
 import type { Image } from "@hartat/types/images"
 import { fetchCategories } from "@/features/category-manager/utils/categories/fetch"
-import CategoryBadge from "@/components/CategoryBadge"
 import ImageSelectModal from "@/features/image-manager/components/ImageSelectModal"
 import LoadingSpinner from "@/components/LoadingSpinner"
 import QuillEditor from "./QuillEditor"
@@ -42,8 +41,10 @@ function PostEditor({ initialPost, draftPost, isEditing = false }: PostEditorPro
     const [slug, setSlug] = useState(sourcePost?.slug || "")
     const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState(Boolean(sourcePost?.slug))
     const [slugError, setSlugError] = useState<string | null>(null)
+    const [isSlugHelpOpen, setIsSlugHelpOpen] = useState(false)
     const [content, setContent] = useState(sourcePost?.content || "")
     const [categoryId, setCategoryId] = useState<number | null>(sourcePost?.categoryId ?? null)
+    const [isHighlighted, setIsHighlighted] = useState<boolean>(Boolean(sourcePost?.isHighlighted))
     const [bannerAlignment, setBannerAlignment] = useState<BannerAlignment>(
         sourcePost?.bannerAlignment ?? "center"
     )
@@ -78,7 +79,8 @@ function PostEditor({ initialPost, draftPost, isEditing = false }: PostEditorPro
             content: normalizeHtml(initialPost?.content || ""),
             categoryId: initialPost?.categoryId ?? null,
             imageId: initialPost?.image?.id ?? initialPost?.imageId ?? null,
-            bannerAlignment: initialPost?.bannerAlignment ?? "center"
+            bannerAlignment: initialPost?.bannerAlignment ?? "center",
+            isHighlighted: Boolean(initialPost?.isHighlighted)
         }),
         [initialPost]
     )
@@ -90,9 +92,10 @@ function PostEditor({ initialPost, draftPost, isEditing = false }: PostEditorPro
             normalizeHtml(content) !== initialSnapshot.content ||
             categoryId !== initialSnapshot.categoryId ||
             (selectedBanner?.id ?? null) !== initialSnapshot.imageId ||
-            bannerAlignment !== initialSnapshot.bannerAlignment
+            bannerAlignment !== initialSnapshot.bannerAlignment ||
+            isHighlighted !== initialSnapshot.isHighlighted
         )
-    }, [title, slug, content, categoryId, selectedBanner, bannerAlignment, initialSnapshot])
+    }, [title, slug, content, categoryId, selectedBanner, bannerAlignment, isHighlighted, initialSnapshot])
 
     // Block browser tab close / reload when there are unsaved changes
     useEffect(() => {
@@ -186,6 +189,7 @@ function PostEditor({ initialPost, draftPost, isEditing = false }: PostEditorPro
             slug: cleanSlug,
             content,
             bannerAlignment,
+            isHighlighted,
             categoryId,
             category: categories.find((c) => c.id === categoryId) || null,
             imageId: selectedBanner?.id ?? null,
@@ -243,6 +247,7 @@ function PostEditor({ initialPost, draftPost, isEditing = false }: PostEditorPro
                     slug: cleanSlug,
                     content: trimmedContent,
                     bannerAlignment,
+                    isHighlighted,
                     categoryId,
                     imageId: selectedBanner?.id ?? null
                 })
@@ -254,6 +259,7 @@ function PostEditor({ initialPost, draftPost, isEditing = false }: PostEditorPro
                     slug: cleanSlug,
                     content: trimmedContent,
                     bannerAlignment,
+                    isHighlighted,
                     categoryId,
                     imageId: selectedBanner?.id ?? null
                 })
@@ -278,38 +284,38 @@ function PostEditor({ initialPost, draftPost, isEditing = false }: PostEditorPro
         <div className="flex flex-col gap-5 max-w-5xl w-full min-w-0 mx-auto pb-12">
             {isLoading && <LoadingSpinner />}
 
-            <div className="flex items-center justify-between flex-wrap gap-3">
-                <div className="flex items-center gap-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex items-center gap-2 sm:gap-3">
                     <button
                         type="button"
                         onClick={() => navigate("/posts")}
-                        className="p-2 rounded-full hover:bg-gray-200 text-gray-700 cursor-pointer transition-colors"
+                        className="p-2 rounded-full hover:bg-gray-200 text-gray-700 cursor-pointer transition-colors shrink-0"
                         title="Voltar para postagens"
                     >
                         <ArrowLeftIcon className="text-xl" />
                     </button>
-                    <h1 className="text-2xl font-bold">
+                    <h1 className="text-xl sm:text-2xl font-bold truncate">
                         {isEditing ? "Editar Postagem" : "Nova Postagem"}
                     </h1>
                 </div>
 
-                <div className="flex items-center gap-2 flex-wrap">
+                <div className="flex items-center gap-2 w-full sm:w-auto">
                     <button
                         type="button"
                         onClick={handlePreview}
-                        className="flex items-center gap-2 px-4 py-2 rounded-full border border-gray-300 text-gray-700 hover:bg-gray-100 cursor-pointer font-medium transition-colors"
+                        className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3 sm:px-4 py-2 rounded-full border border-gray-300 text-gray-700 hover:bg-gray-100 cursor-pointer font-medium transition-colors text-sm sm:text-base whitespace-nowrap"
                     >
-                        <EyeIcon className="text-lg" />
-                        Pré-visualizar
+                        <EyeIcon className="text-lg shrink-0" />
+                        <span>Pré-visualizar</span>
                     </button>
 
                     <button
                         type="button"
                         onClick={handleSubmit}
-                        className="flex items-center gap-2 px-5 py-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-medium cursor-pointer transition-colors"
+                        className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3 sm:px-5 py-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-medium cursor-pointer transition-colors text-sm sm:text-base whitespace-nowrap"
                     >
-                        <FloppyDiskIcon className="text-lg" />
-                        {isEditing ? "Salvar Alterações" : "Publicar Postagem"}
+                        <FloppyDiskIcon className="text-lg shrink-0" />
+                        <span>{isEditing ? "Salvar Alterações" : "Publicar Postagem"}</span>
                     </button>
                 </div>
             </div>
@@ -385,15 +391,15 @@ function PostEditor({ initialPost, draftPost, isEditing = false }: PostEditorPro
                     ) : (
                         <div
                             onClick={() => setIsBannerModalOpen(true)}
-                            className="border-2 border-dashed border-gray-300 hover:border-blue-500 hover:bg-blue-50/30 rounded-lg p-8 flex flex-col items-center justify-center gap-2 cursor-pointer transition-colors"
+                            className="border-2 border-dashed border-gray-300 hover:border-blue-500 hover:bg-blue-50/30 rounded-lg p-6 sm:p-8 flex flex-col items-center justify-center gap-2 cursor-pointer transition-colors text-center"
                         >
                             <div className="p-3 bg-gray-100 rounded-full text-gray-600">
                                 <ImageIcon className="text-3xl" />
                             </div>
-                            <span className="font-medium text-gray-700">
+                            <span className="font-medium text-gray-700 text-center">
                                 Clique para definir uma imagem de capa
                             </span>
-                            <span className="text-xs text-gray-500">
+                            <span className="text-xs text-gray-500 text-center">
                                 Escolha entre as imagens cadastradas no sistema
                             </span>
                         </div>
@@ -424,17 +430,9 @@ function PostEditor({ initialPost, draftPost, isEditing = false }: PostEditorPro
                     </div>
 
                     <div className="flex flex-col gap-1.5">
-                        <div className="flex items-center justify-between">
-                            <label htmlFor="post-category" className="text-sm font-semibold text-gray-700">
-                                Categoria
-                            </label>
-                            {(() => {
-                                const cat = categories.find((c) => c.id === categoryId)
-                                return cat ? (
-                                    <CategoryBadge name={cat.name} color={cat.color} />
-                                ) : null
-                            })()}
-                        </div>
+                        <label htmlFor="post-category" className="text-sm font-semibold text-gray-700">
+                            Categoria
+                        </label>
                         <select
                             id="post-category"
                             value={categoryId ?? ""}
@@ -457,9 +455,32 @@ function PostEditor({ initialPost, draftPost, isEditing = false }: PostEditorPro
                 {/* Slug Field */}
                 <div className="flex flex-col gap-1.5">
                     <div className="flex items-center justify-between gap-2">
-                        <label htmlFor="post-slug" className="text-sm font-semibold text-gray-700">
-                            Slug (URL)
-                        </label>
+                        <div className="flex items-center gap-1.5">
+                            <label htmlFor="post-slug" className="text-sm font-semibold text-gray-700">
+                                Slug (URL)
+                            </label>
+                            <button
+                                type="button"
+                                onClick={() => setIsSlugHelpOpen((prev) => !prev)}
+                                onBlur={() => setIsSlugHelpOpen(false)}
+                                className="relative group flex items-center cursor-help focus:outline-none"
+                                title="Identificador único da URL. Use apenas letras minúsculas, números e hífens."
+                                aria-label="Ajuda sobre o Slug"
+                            >
+                                <QuestionIcon className="text-base text-gray-400 group-hover:text-gray-600 transition-colors" />
+                                <div
+                                    className={`absolute left-0 bottom-full mb-1.5 flex-col z-20 pointer-events-none ${
+                                        isSlugHelpOpen ? "flex" : "hidden group-hover:flex"
+                                    }`}
+                                >
+                                    <div className="bg-gray-800 text-white text-xs font-normal rounded-md py-1.5 px-2.5 shadow-lg w-60 sm:w-auto max-w-[75vw] whitespace-normal sm:whitespace-nowrap text-left leading-relaxed">
+                                        Identificador único da URL. Use apenas letras minúsculas, números e hífens.
+                                    </div>
+                                    <div className="w-2 h-1 ml-1.5 -mt-px border-t-4 border-t-gray-800 border-x-4 border-x-transparent border-b-0"></div>
+                                </div>
+                            </button>
+                        </div>
+
                         <button
                             type="button"
                             onClick={handleRegenerateSlug}
@@ -491,13 +512,37 @@ function PostEditor({ initialPost, draftPost, isEditing = false }: PostEditorPro
                         />
                     </div>
 
-                    {slugError ? (
+                    {slugError && (
                         <span className="text-xs text-red-600 font-medium">{slugError}</span>
-                    ) : (
-                        <span className="text-xs text-gray-500">
-                            Identificador único da URL. Use apenas letras minúsculas, números e hífens.
-                        </span>
                     )}
+                </div>
+
+                {/* Highlight Option */}
+                <div className="flex items-center justify-between p-3 rounded-lg border border-gray-200 bg-gray-50/60">
+                    <div className="flex items-center gap-2.5">
+                        <StarIcon
+                            weight={isHighlighted ? "fill" : "regular"}
+                            className={`text-lg transition-colors ${isHighlighted ? "text-amber-500" : "text-gray-400"}`}
+                        />
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                            <span className="text-sm font-medium text-gray-700">
+                                Destacar Postagem
+                            </span>
+                            <span className="text-xs text-gray-400">
+                                (máx. 10)
+                            </span>
+                        </div>
+                    </div>
+
+                    <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                        <input
+                            type="checkbox"
+                            checked={isHighlighted}
+                            onChange={(e) => setIsHighlighted(e.target.checked)}
+                            className="sr-only peer"
+                        />
+                        <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                    </label>
                 </div>
 
                 {/* Content Section with Quill */}

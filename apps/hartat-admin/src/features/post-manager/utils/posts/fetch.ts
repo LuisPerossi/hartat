@@ -4,6 +4,7 @@ import type { GetPostsResponse, GetPostResponse, Post } from "@hartat/types/post
 interface FetchPostsProps {
     search?: string
     categoryId?: number
+    isHighlighted?: boolean
     sort?: 'title' | 'date' | 'updated'
     order?: 'asc' | 'desc'
     page?: number
@@ -16,6 +17,7 @@ export async function fetchPosts(props: FetchPostsProps = {}) {
     const {
         search = "",
         categoryId,
+        isHighlighted,
         sort = "date",
         order = "desc",
         page = 1,
@@ -25,6 +27,7 @@ export async function fetchPosts(props: FetchPostsProps = {}) {
     const params = new URLSearchParams()
     if (search.trim()) params.set("search", search.trim())
     if (categoryId !== undefined) params.set("categoryId", String(categoryId))
+    if (isHighlighted !== undefined) params.set("isHighlighted", String(isHighlighted))
     params.set("sort", sort)
     params.set("order", order)
     params.set("page", String(page))

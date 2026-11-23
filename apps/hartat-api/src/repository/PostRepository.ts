@@ -6,6 +6,7 @@ export type PostRow = {
     readonly slug: string | null
     readonly content: string
     readonly banner_alignment: string | null
+    readonly is_highlighted: number | null
     readonly created_at: string
     readonly updated_at: string
     readonly category_id: number | null
@@ -24,8 +25,8 @@ export class PostRepository {
         const result = await this.db
             .prepare(`
                 INSERT INTO 
-                posts (title, slug, content, banner_alignment, category_id, image_id)
-                VALUES (?, ?, ?, ?, ?, ?)
+                posts (title, slug, content, banner_alignment, is_highlighted, category_id, image_id)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
                 RETURNING id
             `)
             .bind(
@@ -33,6 +34,7 @@ export class PostRepository {
                 createPost.slug,
                 createPost.content,
                 createPost.bannerAlignment ?? 'center',
+                createPost.isHighlighted ? 1 : 0,
                 createPost.categoryId ?? null,
                 createPost.imageId ?? null
             )
@@ -55,6 +57,7 @@ export class PostRepository {
                     p.slug,
                     p.content, 
                     p.banner_alignment,
+                    p.is_highlighted,
                     p.created_at, 
                     p.updated_at, 
                     p.category_id, 
@@ -84,6 +87,7 @@ export class PostRepository {
                     p.slug,
                     p.content, 
                     p.banner_alignment,
+                    p.is_highlighted,
                     p.created_at, 
                     p.updated_at, 
                     p.category_id, 
@@ -130,8 +134,33 @@ export class PostRepository {
         return result !== null
     }
 
+    public async countHighlighted(excludeId?: number) {
+        if (excludeId !== undefined) {
+            const result = await this.db
+                .prepare(`
+                    SELECT COUNT(*) AS count
+                    FROM posts
+                    WHERE is_highlighted = 1 AND id != ?
+                `)
+                .bind(excludeId)
+                .first<{ count: number }>()
+
+            return result?.count ?? 0
+        }
+
+        const result = await this.db
+            .prepare(`
+                SELECT COUNT(*) AS count
+                FROM posts
+                WHERE is_highlighted = 1
+            `)
+            .first<{ count: number }>()
+
+        return result?.count ?? 0
+    }
+
     public async getAll(getPosts: GetPosts) {
-        const { page, limit, search, categoryId, sort, order } = getPosts
+        const { page, limit, search, categoryId, isHighlighted, sort, order } = getPosts
 
         const offset = (page - 1) * limit
         const sortColumn = {
@@ -148,6 +177,11 @@ export class PostRepository {
             bindings.push(categoryId)
         }
 
+        if (isHighlighted !== undefined) {
+            whereClauses.push('p.is_highlighted = ?')
+            bindings.push(isHighlighted ? 1 : 0)
+        }
+
         const { results } = await this.db
             .prepare(`
                 SELECT 
@@ -156,6 +190,7 @@ export class PostRepository {
                     p.slug,
                     p.content, 
                     p.banner_alignment,
+                    p.is_highlighted,
                     p.created_at, 
                     p.updated_at, 
                     p.category_id, 
@@ -178,8 +213,8 @@ export class PostRepository {
         return results
     }
 
-    public async count(filter: { search?: string, categoryId?: number }) {
-        const { search, categoryId } = filter
+    public async count(filter: { search?: string, categoryId?: number, isHighlighted?: boolean }) {
+        const { search, categoryId, isHighlighted } = filter
 
         const whereClauses: string[] = ['title LIKE ?']
         const bindings: (string | number)[] = [search ? `%${search}%` : '%']
@@ -187,6 +222,11 @@ export class PostRepository {
         if (categoryId !== undefined) {
             whereClauses.push('category_id = ?')
             bindings.push(categoryId)
+        }
+
+        if (isHighlighted !== undefined) {
+            whereClauses.push('is_highlighted = ?')
+            bindings.push(isHighlighted ? 1 : 0)
         }
 
         const result = await this.db
@@ -223,6 +263,11 @@ export class PostRepository {
         if (updatePost.bannerAlignment !== undefined) {
             fields.push('banner_alignment = ?')
             values.push(updatePost.bannerAlignment)
+        }
+
+        if (updatePost.isHighlighted !== undefined) {
+            fields.push('is_highlighted = ?')
+            values.push(updatePost.isHighlighted ? 1 : 0)
         }
 
         if (updatePost.categoryId !== undefined) {

@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom"
-import { EyeIcon, ImageIcon, PencilIcon, TrashIcon } from "@phosphor-icons/react"
+import { EyeIcon, ImageIcon, PencilIcon, StarIcon, TrashIcon } from "@phosphor-icons/react"
 import { API_URL } from "@/config/env"
 import type { Post } from "@hartat/types/posts"
-import { deletePost } from "../utils/posts"
+import { deletePost, updatePost } from "../utils/posts"
 import { formatDateTime, getBannerAlignmentClass, isPostModified } from "../utils/format"
 import CategoryBadge from "@/components/CategoryBadge"
 
@@ -13,6 +13,20 @@ interface PostListProps {
 }
 
 function PostList({ posts, onDeleted, setIsLoading }: PostListProps) {
+    const handleToggleHighlight = async (post: Post) => {
+        setIsLoading(true)
+        try {
+            await updatePost(post.id, { isHighlighted: !post.isHighlighted })
+            onDeleted()
+        } catch (err: unknown) {
+            console.error(err)
+            const message = err instanceof Error ? err.message : "Erro ao alterar destaque"
+            window.alert(message)
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
     const handleDelete = async (post: Post) => {
         const confirm = window.confirm(`Tem certeza que deseja excluir a postagem "${post.title}"?`)
         if (!confirm) return
@@ -117,6 +131,19 @@ function PostList({ posts, onDeleted, setIsLoading }: PostListProps) {
                                         {/* Ações */}
                                         <td className="py-3 px-4 text-right">
                                             <div className="flex justify-end items-center gap-1">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleToggleHighlight(post)}
+                                                    title={post.isHighlighted ? "Remover dos destaques" : "Destacar na Home"}
+                                                    className={`p-1.5 rounded-sm cursor-pointer transition-colors ${
+                                                        post.isHighlighted
+                                                            ? "bg-amber-100 text-amber-700 hover:bg-amber-200"
+                                                            : "bg-gray-200 hover:bg-gray-300 text-gray-600 hover:text-amber-600"
+                                                    }`}
+                                                >
+                                                    <StarIcon weight={post.isHighlighted ? "fill" : "regular"} className="text-lg" />
+                                                </button>
+
                                                 <Link
                                                     to={`/posts/preview/${post.id}`}
                                                     title="Pré-visualizar postagem"
@@ -137,7 +164,7 @@ function PostList({ posts, onDeleted, setIsLoading }: PostListProps) {
                                                     type="button"
                                                     onClick={() => handleDelete(post)}
                                                     title="Excluir postagem"
-                                                    className="p-1.5 rounded-sm bg-gray-200 hover:bg-gray-300 text-gray-700 cursor-pointer transition-colors"
+                                                    className="p-1.5 rounded-sm bg-gray-200 hover:bg-red-100 hover:text-red-600 text-gray-700 cursor-pointer transition-colors"
                                                 >
                                                     <TrashIcon className="text-lg" />
                                                 </button>
@@ -176,19 +203,14 @@ function PostList({ posts, onDeleted, setIsLoading }: PostListProps) {
                                         </div>
                                     )}
 
-                                    <div className="flex flex-col min-w-0 flex-1 gap-0.5">
+                                    <div className="flex flex-col min-w-0 flex-1 justify-center gap-1">
                                         <Link
                                             to={`/posts/edit/${post.id}`}
-                                            className="font-medium text-gray-900 hover:text-blue-600 transition-colors leading-snug break-words"
+                                            className="font-medium text-gray-900 hover:text-blue-600 transition-colors leading-snug wrap-break-word"
                                         >
                                             {post.title}
                                         </Link>
-                                        {post.slug && (
-                                            <span className="text-xs text-gray-400 truncate">
-                                                /{post.slug}
-                                            </span>
-                                        )}
-                                        <div className="mt-1">
+                                        <div>
                                             {post.category ? (
                                                 <CategoryBadge
                                                     name={post.category.name}
@@ -212,6 +234,19 @@ function PostList({ posts, onDeleted, setIsLoading }: PostListProps) {
                                     </div>
 
                                     <div className="flex items-center gap-1 shrink-0">
+                                        <button
+                                            type="button"
+                                            onClick={() => handleToggleHighlight(post)}
+                                            title={post.isHighlighted ? "Remover dos destaques" : "Destacar na Home"}
+                                            className={`p-1.5 rounded-sm cursor-pointer transition-colors ${
+                                                post.isHighlighted
+                                                    ? "bg-amber-100 text-amber-700 hover:bg-amber-200"
+                                                    : "bg-gray-200 hover:bg-gray-300 text-gray-600 hover:text-amber-600"
+                                            }`}
+                                        >
+                                            <StarIcon weight={post.isHighlighted ? "fill" : "regular"} className="text-lg" />
+                                        </button>
+
                                         <Link
                                             to={`/posts/preview/${post.id}`}
                                             title="Pré-visualizar postagem"
@@ -232,7 +267,7 @@ function PostList({ posts, onDeleted, setIsLoading }: PostListProps) {
                                             type="button"
                                             onClick={() => handleDelete(post)}
                                             title="Excluir postagem"
-                                            className="p-1.5 rounded-sm bg-gray-200 hover:bg-gray-300 text-gray-700 cursor-pointer transition-colors"
+                                            className="p-1.5 rounded-sm bg-gray-200 hover:bg-red-100 hover:text-red-600 text-gray-700 cursor-pointer transition-colors"
                                         >
                                             <TrashIcon className="text-lg" />
                                         </button>

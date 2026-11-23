@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom"
-import { ArrowLeftIcon, CalendarBlankIcon, ClockCounterClockwiseIcon, PencilIcon } from "@phosphor-icons/react"
+import { ArrowLeftIcon, CalendarBlankIcon, ClockCounterClockwiseIcon, PencilIcon, StarIcon } from "@phosphor-icons/react"
 import { API_URL } from "@/config/env"
 import type { Post } from "@hartat/types/posts"
 import { formatDateTime, getBannerAlignmentClass, isPostModified } from "../utils/format"
@@ -81,6 +81,12 @@ function PostPreview({ post, isDraft = false, returnTo }: PostPreviewProps) {
                 <div className="p-6 md:p-10 flex flex-col gap-5">
                     {/* Meta header */}
                     <div className="flex items-center gap-4 text-sm text-gray-500 flex-wrap">
+                        {post.isHighlighted && (
+                            <span className="bg-amber-100 text-amber-800 text-xs font-semibold px-2.5 py-1 rounded-full flex items-center gap-1 border border-amber-200">
+                                <StarIcon weight="fill" className="text-amber-500" />
+                                Destaque na Home
+                            </span>
+                        )}
                         {post.category && (
                             <CategoryBadge
                                 name={post.category.name}

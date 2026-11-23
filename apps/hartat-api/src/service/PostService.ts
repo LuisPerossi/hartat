@@ -47,6 +47,13 @@ export class PostService {
             }
         }
 
+        if (createPost.isHighlighted) {
+            const highlightedCount = await this.repository.countHighlighted()
+            if (highlightedCount >= 10) {
+                throw new ContentfulError('Limite de 10 postagens em destaque atingido. Desmarque o destaque de outra postagem antes de destacar esta.', 400)
+            }
+        }
+
         let slug: string
         if (createPost.slug) {
             const exists = await this.repository.slugExists(createPost.slug)
@@ -83,7 +90,8 @@ export class PostService {
         const data = await this.repository.getAll(getPosts)
         const count = await this.repository.count({
             search: getPosts.search,
-            categoryId: getPosts.categoryId
+            categoryId: getPosts.categoryId,
+            isHighlighted: getPosts.isHighlighted
         })
 
         const { page, limit } = getPosts
@@ -111,6 +119,13 @@ export class PostService {
             const exists = await this.repository.imageExists(updatePost.imageId)
             if (!exists) {
                 throw new NotFoundError('Image not found')
+            }
+        }
+
+        if (updatePost.isHighlighted) {
+            const highlightedCount = await this.repository.countHighlighted(id)
+            if (highlightedCount >= 10) {
+                throw new ContentfulError('Limite de 10 postagens em destaque atingido. Desmarque o destaque de outra postagem antes de destacar esta.', 400)
             }
         }
 
