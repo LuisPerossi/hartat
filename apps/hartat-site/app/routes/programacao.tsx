@@ -183,7 +183,7 @@ export default function Programacao({ loaderData }: Route.ComponentProps) {
           </button>
 
           {calendarOpen && (
-            <div className="absolute top-full right-0 z-30 mt-2 w-[320px] sm:w-[340px]">
+            <div className="absolute top-full right-0 z-30 mt-2 w-[320px] sm:w-85">
               <EventCalendar
                 viewYear={viewYear}
                 viewMonth={viewMonth}

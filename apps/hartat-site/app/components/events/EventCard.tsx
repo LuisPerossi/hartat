@@ -49,7 +49,7 @@ export function EventCard({
     return (
       <article className="grid grid-cols-1 overflow-hidden rounded-3xl border border-[#E8D5BF] bg-[#FAF0E4] shadow-sm transition-shadow hover:shadow-md lg:grid-cols-12">
         {/* Feature Image */}
-        <div className="flex h-56 items-center justify-center overflow-hidden bg-[#F2E2CE] lg:col-span-5 lg:h-auto lg:min-h-[260px]">
+        <div className="flex h-56 items-center justify-center overflow-hidden bg-[#F2E2CE] lg:col-span-5 lg:h-auto lg:min-h-65">
           <img
             src={imageUrl}
             alt={event.title}

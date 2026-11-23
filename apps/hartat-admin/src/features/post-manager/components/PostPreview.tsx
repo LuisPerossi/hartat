@@ -119,7 +119,7 @@ function PostPreview({ post, isDraft = false, returnTo }: PostPreviewProps) {
 
                     {/* Article Content Rendered */}
                     <div
-                        className="post-content-preview text-gray-800 text-base md:text-lg leading-relaxed break-words"
+                        className="post-content-preview text-gray-800 text-base md:text-lg leading-relaxed wrap-break-word"
                         dangerouslySetInnerHTML={{ __html: post.content }}
                     />
                 </div>

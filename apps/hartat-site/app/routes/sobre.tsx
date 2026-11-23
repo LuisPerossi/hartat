@@ -45,7 +45,7 @@ export default function Sobre() {
   return (
     <div>
       {/* Editorial Hero Banner */}
-      <section className="relative flex min-h-[260px] w-full items-center justify-center overflow-hidden sm:min-h-[320px] lg:min-h-[360px]">
+      <section className="relative flex min-h-65 w-full items-center justify-center overflow-hidden sm:min-h-80 lg:min-h-90">
         <img
           src="/images/maloca-interior.png"
           alt="Interior da maloca do Espaço Hartãt"
@@ -57,7 +57,7 @@ export default function Sobre() {
         />
 
         <div className="relative z-10 mx-auto max-w-4xl px-6 py-12 text-center">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#FFDBB8] sm:text-sm">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-bg-secondary sm:text-sm">
             Sobre o Espaço Hartãt
           </p>
           <h1 className="mt-3 font-serif text-2xl font-bold leading-snug text-balance text-white drop-shadow-sm sm:text-3xl lg:text-4xl">
@@ -140,7 +140,7 @@ export default function Sobre() {
                   src="/images/sobre/historia.jpg"
                   alt="Registro histórico do Espaço Hartãt"
                   loading="lazy"
-                  className="aspect-[4/3] w-full object-cover"
+                  className="aspect-4/3 w-full object-cover"
                 />
               </div>
             </div>
@@ -230,7 +230,7 @@ export default function Sobre() {
               </p>
             </div>
 
-            <div className="flex w-full shrink-0 flex-col gap-3 sm:w-auto sm:min-w-[220px]">
+            <div className="flex w-full shrink-0 flex-col gap-3 sm:w-auto sm:min-w-55">
               <Link
                 to="/programacao"
                 className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-white shadow-xs transition-colors hover:bg-accent/90 sm:text-base"

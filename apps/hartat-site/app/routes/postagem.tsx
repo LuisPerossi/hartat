@@ -86,7 +86,7 @@ export default function Postagem({ loaderData }: Route.ComponentProps) {
     <article>
       {/* Full-bleed Cover Banner with Floating Back Pill */}
       {bannerUrl && (
-        <div className="relative h-60 w-full overflow-hidden bg-primary/20 sm:h-80 lg:h-[420px]">
+        <div className="relative h-60 w-full overflow-hidden bg-primary/20 sm:h-80 lg:h-105">
           <img
             src={bannerUrl}
             alt={post.title}
@@ -94,7 +94,7 @@ export default function Postagem({ loaderData }: Route.ComponentProps) {
           />
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/35 to-transparent"
+            className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-linear-to-b from-black/35 to-transparent"
           />
           <button
             type="button"
@@ -157,7 +157,7 @@ export default function Postagem({ loaderData }: Route.ComponentProps) {
 
         {/* Rendered Rich Text (Quill HTML) */}
         <div
-          className="post-content mt-8 break-words text-base leading-relaxed text-black sm:text-lg"
+          className="post-content mt-8 wrap-break-word text-base leading-relaxed text-black sm:text-lg"
           dangerouslySetInnerHTML={{ __html: post.content }}
         />
       </div>
