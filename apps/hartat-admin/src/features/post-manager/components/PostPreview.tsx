@@ -95,7 +95,7 @@ function PostPreview({ post, isDraft = false, returnTo }: PostPreviewProps) {
                         )}
                         <div className="flex items-center gap-1.5">
                             <CalendarBlankIcon className="text-base text-gray-400" />
-                            <span>{formattedCreatedAt}</span>
+                            <span>{post.createdAt ? `Postado em ${formattedCreatedAt}` : formattedCreatedAt}</span>
                         </div>
                         {formattedUpdatedAt && (
                             <div className="flex items-center gap-1.5 text-gray-400">
@@ -107,7 +107,7 @@ function PostPreview({ post, isDraft = false, returnTo }: PostPreviewProps) {
 
                     {/* Article Title & Slug */}
                     <div className="flex flex-col gap-1">
-                        <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight leading-tight">
+                        <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight leading-tight text-balance">
                             {post.title}
                         </h1>
                         {post.slug && (
@@ -119,7 +119,7 @@ function PostPreview({ post, isDraft = false, returnTo }: PostPreviewProps) {
 
                     {/* Article Content Rendered */}
                     <div
-                        className="post-content-preview text-gray-800 text-base md:text-lg leading-relaxed flex flex-col gap-4 break-words"
+                        className="post-content-preview text-gray-800 text-base md:text-lg leading-relaxed break-words"
                         dangerouslySetInnerHTML={{ __html: post.content }}
                     />
                 </div>
@@ -127,6 +127,14 @@ function PostPreview({ post, isDraft = false, returnTo }: PostPreviewProps) {
 
             {/* Content Styling for rendered HTML */}
             <style>{`
+                .post-content-preview > * + * {
+                    margin-top: 0.625rem;
+                }
+                .post-content-preview p:has(> br:only-child) {
+                    height: 0.5rem;
+                    line-height: 0;
+                    margin-top: 0;
+                }
                 .post-content-preview h1 {
                     font-size: 1.875rem;
                     line-height: 2.25rem;
@@ -142,9 +150,6 @@ function PostPreview({ post, isDraft = false, returnTo }: PostPreviewProps) {
                     color: #1f2937;
                     margin-top: 1.25rem;
                     margin-bottom: 0.5rem;
-                }
-                .post-content-preview p {
-                    margin-bottom: 0.75rem;
                 }
                 .post-content-preview .ql-align-center {
                     text-align: center;
