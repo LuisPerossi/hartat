@@ -116,25 +116,30 @@ function CategoryManager() {
 
             <h1 className="text-2xl font-bold"> Minhas Categorias </h1>
 
-            <div className="flex gap-3 flex-wrap">
+            <div className="flex gap-3 flex-wrap items-center">
                 <Searchbar onSearch={setSearch} />
-                <label className="flex gap-2 items-center text-sm font-medium text-gray-700">
-                    Ordenar:
-                    <select
-                        onChange={handleSortChange}
-                        defaultValue="name-asc"
-                        className="rounded-md border border-gray-300 px-2 py-1.5 bg-white cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500"
-                    >
-                        <option value="name-asc">Nome (A-Z)</option>
-                        <option value="name-desc">Nome (Z-A)</option>
-                        <option value="postCount-desc">Postagens (maior)</option>
-                        <option value="postCount-asc">Postagens (menor)</option>
-                    </select>
-                </label>
                 <CreateButton 
                     onClick={handleOpenCreate}
                     disabled={isLimitReached}
                 />
+            </div>
+
+            <div className="flex flex-col gap-2.5 sm:gap-3 md:flex-row md:items-center md:justify-between">
+                <div className="w-full md:w-auto md:ml-auto">
+                    <label className="flex w-full md:w-auto gap-2 items-center text-sm font-medium text-gray-700 min-w-0">
+                        <span className="shrink-0">Ordenar:</span>
+                        <select
+                            onChange={handleSortChange}
+                            defaultValue="name-asc"
+                            className="flex-1 md:flex-initial w-full md:w-auto min-w-0 rounded-md border border-gray-300 px-2.5 py-1.5 bg-white cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
+                        >
+                            <option value="name-asc">Nome (A-Z)</option>
+                            <option value="name-desc">Nome (Z-A)</option>
+                            <option value="postCount-desc">Postagens (maior)</option>
+                            <option value="postCount-asc">Postagens (menor)</option>
+                        </select>
+                    </label>
+                </div>
             </div>
 
             <CategoryList 

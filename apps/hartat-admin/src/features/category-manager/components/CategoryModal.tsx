@@ -261,17 +261,15 @@ function CategoryModal({
                         </div>
                     </div>
 
-                    {/* Live Preview Box */}
-                    <div className="bg-gray-50 border border-gray-200 rounded-lg p-3.5 flex flex-col gap-1.5">
-                        <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Visualização da tag
+                    {/* Compact Live Preview */}
+                    <div className="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-lg px-3.5 py-2">
+                        <span className="text-xs font-medium text-gray-500">
+                            Pré-visualização
                         </span>
-                        <div className="flex items-center gap-2 pt-1">
-                            <CategoryBadge
-                                name={name.trim() || "Exemplo de Categoria"}
-                                color={validColor}
-                            />
-                        </div>
+                        <CategoryBadge
+                            name={name.trim() || "Exemplo de Categoria"}
+                            color={validColor}
+                        />
                     </div>
 
                     {/* Action Buttons */}
