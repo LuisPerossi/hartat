@@ -1,5 +1,7 @@
 import type { BannerAlignment } from "@hartat/types/posts";
 
+export const DEFAULT_FALLBACK_IMAGE = "/images/hero-banner.webp";
+
 const ALIGNMENT_CLASSES: Record<BannerAlignment, string> = {
   top: "object-top",
   center: "object-center",

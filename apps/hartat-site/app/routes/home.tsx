@@ -85,9 +85,9 @@ export default function Home({ loaderData }: Route.ComponentProps) {
       {/* Static Hero Banner */}
       <section className="relative flex h-64 w-full items-center justify-center overflow-hidden sm:h-80 lg:h-100">
         <img
-          src="/images/hero-banner.png"
+          src="/images/hero-banner.webp"
           alt="Entrada do Espaço Hartãt cercada por vegetação"
-          className="absolute inset-0 h-full w-full object-cover object-bottom"
+          className="absolute inset-0 h-full w-full object-cover object-center"
         />
         <div
           aria-hidden="true"

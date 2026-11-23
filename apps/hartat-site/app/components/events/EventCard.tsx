@@ -1,9 +1,8 @@
 import { ArrowSquareOutIcon } from "@phosphor-icons/react/dist/ssr/ArrowSquareOut";
 import { CalendarBlankIcon } from "@phosphor-icons/react/dist/ssr/CalendarBlank";
 import { ClockIcon } from "@phosphor-icons/react/dist/ssr/Clock";
-import { ImageIcon } from "@phosphor-icons/react/dist/ssr/Image";
 import type { Event } from "@hartat/types/events";
-import { getImageUrl } from "@/lib/format";
+import { DEFAULT_FALLBACK_IMAGE, getImageUrl } from "@/lib/format";
 import {
   formatEventSchedule,
   getDateTileParts,
@@ -39,7 +38,9 @@ export function EventCard({
   todayKey,
   variant = "regular",
 }: EventCardProps) {
-  const imageUrl = getImageUrl(apiUrl, event.image?.key, { preview: true });
+  const imageUrl =
+    getImageUrl(apiUrl, event.image?.key, { preview: true }) ??
+    DEFAULT_FALLBACK_IMAGE;
   const { dateLabel, timeLabel } = formatEventSchedule(event);
   const status = getEventVisualStatus(event, todayKey);
   const badge = STATUS_BADGE[status];
@@ -49,21 +50,15 @@ export function EventCard({
       <article className="grid grid-cols-1 overflow-hidden rounded-3xl border border-[#E8D5BF] bg-[#FAF0E4] shadow-sm transition-shadow hover:shadow-md lg:grid-cols-12">
         {/* Feature Image */}
         <div className="flex h-56 items-center justify-center overflow-hidden bg-[#F2E2CE] lg:col-span-5 lg:h-auto lg:min-h-[260px]">
-          {imageUrl ? (
-            <img
-              src={imageUrl}
-              alt={event.title}
-              loading="lazy"
-              className="h-full w-full object-cover"
-            />
-          ) : (
-            <ImageIcon
-              size={56}
-              weight="duotone"
-              aria-hidden="true"
-              className="text-secondary/40"
-            />
-          )}
+          <img
+            src={imageUrl}
+            alt={event.title}
+            loading="lazy"
+            onError={(e) => {
+              e.currentTarget.src = DEFAULT_FALLBACK_IMAGE;
+            }}
+            className={`h-full w-full object-cover ${event.image ? "object-center" : "object-bottom"}`}
+          />
         </div>
 
         {/* Editorial Content */}
@@ -144,23 +139,17 @@ export function EventCard({
         </span>
       </div>
 
-      {/* Optional Thumbnail */}
+      {/* Thumbnail */}
       <div className="flex h-40 w-full shrink-0 items-center justify-center overflow-hidden rounded-xl bg-[#F2E2CE] sm:h-auto sm:w-44">
-        {imageUrl ? (
-          <img
-            src={imageUrl}
-            alt={event.title}
-            loading="lazy"
-            className="h-full w-full object-cover"
-          />
-        ) : (
-          <ImageIcon
-            size={36}
-            weight="duotone"
-            aria-hidden="true"
-            className="text-secondary/45"
-          />
-        )}
+        <img
+          src={imageUrl}
+          alt={event.title}
+          loading="lazy"
+          onError={(e) => {
+            e.currentTarget.src = DEFAULT_FALLBACK_IMAGE;
+          }}
+          className={`h-full w-full object-cover ${event.image ? "object-center" : "object-bottom"}`}
+        />
       </div>
 
       {/* Details */}
