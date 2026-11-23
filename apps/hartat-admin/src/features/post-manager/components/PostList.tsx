@@ -52,7 +52,7 @@ function PostList({ posts, onDeleted, setIsLoading }: PostListProps) {
                 <table className="w-full text-left border-collapse">
                     <thead>
                         <tr className="divide-x divide-gray-200 bg-gray-100 border-b border-gray-300 text-sm font-semibold text-gray-700">
-                            <th className="py-3 px-4 w-16 text-center">Capa</th>
+                            <th className="py-3 px-4 w-20 text-center">Capa</th>
                             <th className="py-3 px-4 w-full">Título</th>
                             <th className="py-3 px-4 text-center whitespace-nowrap">Categoria</th>
                             <th className="py-3 px-4 text-center whitespace-nowrap">Data</th>
@@ -78,10 +78,10 @@ function PostList({ posts, onDeleted, setIsLoading }: PostListProps) {
                                                 <img
                                                     src={`${API_URL}/images/${post.image.key}?preview`}
                                                     alt={post.title}
-                                                    className={`w-12 h-12 rounded object-cover ${getBannerAlignmentClass(post.bannerAlignment)} mx-auto border border-gray-200`}
+                                                    className={`w-12 h-12 min-w-12 aspect-square rounded object-cover ${getBannerAlignmentClass(post.bannerAlignment)} mx-auto border border-gray-200`}
                                                 />
                                             ) : (
-                                                <div className="w-12 h-12 rounded bg-gray-100 border border-gray-200 flex items-center justify-center mx-auto text-gray-400">
+                                                <div className="w-12 h-12 min-w-12 aspect-square rounded bg-gray-100 border border-gray-200 flex items-center justify-center mx-auto text-gray-400">
                                                     <ImageIcon className="text-xl" />
                                                 </div>
                                             )}
@@ -195,10 +195,10 @@ function PostList({ posts, onDeleted, setIsLoading }: PostListProps) {
                                         <img
                                             src={`${API_URL}/images/${post.image.key}?preview`}
                                             alt={post.title}
-                                            className={`w-14 h-14 rounded object-cover ${getBannerAlignmentClass(post.bannerAlignment)} shrink-0 border border-gray-200`}
+                                            className={`w-14 h-14 min-w-14 aspect-square rounded object-cover ${getBannerAlignmentClass(post.bannerAlignment)} shrink-0 border border-gray-200`}
                                         />
                                     ) : (
-                                        <div className="w-14 h-14 rounded bg-gray-100 border border-gray-200 flex items-center justify-center shrink-0 text-gray-400">
+                                        <div className="w-14 h-14 min-w-14 aspect-square rounded bg-gray-100 border border-gray-200 flex items-center justify-center shrink-0 text-gray-400">
                                             <ImageIcon className="text-xl" />
                                         </div>
                                     )}
