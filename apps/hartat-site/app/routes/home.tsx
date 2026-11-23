@@ -3,6 +3,7 @@ import { ArrowRightIcon } from "@phosphor-icons/react/dist/ssr/ArrowRight";
 import { CalendarBlankIcon } from "@phosphor-icons/react/dist/ssr/CalendarBlank";
 import { ImageIcon } from "@phosphor-icons/react/dist/ssr/Image";
 import { MapPinIcon } from "@phosphor-icons/react/dist/ssr/MapPin";
+import { NewspaperIcon } from "@phosphor-icons/react/dist/ssr/Newspaper";
 import type { Post } from "@hartat/types/posts";
 import type { Route } from "./+types/home";
 import { cloudflareContext } from "@/lib/cloudflare.server";
@@ -95,15 +96,9 @@ export default function Home({ loaderData }: Route.ComponentProps) {
         />
 
         <div className="relative z-10 mx-auto flex max-w-2xl flex-col items-center px-6 text-center">
-          <h1 className="font-serif text-2xl font-bold leading-tight text-white drop-shadow-[0_3px_2px_rgba(0,0,0,0.45)] sm:text-3xl lg:text-4xl">
+          <h1 className="font-serif text-2xl font-bold leading-tight text-balance text-white drop-shadow-[0_3px_2px_rgba(0,0,0,0.45)] sm:text-3xl lg:text-4xl">
             O maior acervo de peças indígenas de todo o Litoral Norte
           </h1>
-          <Link
-            to="/sobre"
-            className="mt-6 inline-flex items-center justify-center rounded-full bg-accent px-8 py-3 text-base font-semibold text-white shadow-sm transition-colors hover:bg-accent/90 sm:text-lg"
-          >
-            Saiba mais
-          </Link>
         </div>
       </section>
 
@@ -111,28 +106,36 @@ export default function Home({ loaderData }: Route.ComponentProps) {
       <div className="mx-auto max-w-7xl px-6 pt-6 pb-14 lg:px-10 lg:pt-8 lg:pb-20">
         {/* Quick Action Buttons */}
         <nav aria-label="Acesso rápido">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 lg:gap-6">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-5">
             <Link
               to="/programacao"
-              className="flex items-center justify-center gap-3 rounded-2xl bg-secondary px-6 py-4 text-lg font-medium text-white shadow-sm transition-colors hover:bg-secondary/90"
+              className="flex items-center justify-center gap-3 rounded-2xl bg-secondary px-5 py-4 text-lg font-medium text-white shadow-sm transition-colors hover:bg-secondary/90"
             >
-              <CalendarBlankIcon size={26} weight="regular" aria-hidden="true" />
+              <CalendarBlankIcon size={24} weight="regular" aria-hidden="true" />
               <span>Programação</span>
             </Link>
 
             <Link
-              to="/postagens?categoria=Acervo"
-              className="flex items-center justify-center gap-3 rounded-2xl bg-secondary px-6 py-4 text-lg font-medium text-white shadow-sm transition-colors hover:bg-secondary/90"
+              to="/postagens"
+              className="flex items-center justify-center gap-3 rounded-2xl bg-secondary px-5 py-4 text-lg font-medium text-white shadow-sm transition-colors hover:bg-secondary/90"
             >
-              <ImageIcon size={26} weight="regular" aria-hidden="true" />
+              <NewspaperIcon size={24} weight="regular" aria-hidden="true" />
+              <span>Postagens</span>
+            </Link>
+
+            <Link
+              to="/postagens?categoria=Acervo"
+              className="flex items-center justify-center gap-3 rounded-2xl bg-secondary px-5 py-4 text-lg font-medium text-white shadow-sm transition-colors hover:bg-secondary/90"
+            >
+              <ImageIcon size={24} weight="regular" aria-hidden="true" />
               <span>Acervo Virtual</span>
             </Link>
 
             <a
               href="#onde-estamos"
-              className="flex items-center justify-center gap-3 rounded-2xl bg-secondary px-6 py-4 text-lg font-medium text-white shadow-sm transition-colors hover:bg-secondary/90"
+              className="flex items-center justify-center gap-3 rounded-2xl bg-secondary px-5 py-4 text-lg font-medium text-white shadow-sm transition-colors hover:bg-secondary/90"
             >
-              <MapPinIcon size={26} weight="regular" aria-hidden="true" />
+              <MapPinIcon size={24} weight="regular" aria-hidden="true" />
               <span>Visite-nos</span>
             </a>
           </div>
