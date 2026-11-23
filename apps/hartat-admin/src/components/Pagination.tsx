@@ -20,8 +20,8 @@ function Pagination({ page, totalPages, onChange: setPage }: PaginationProps) {
     return (
         <div className="flex flex-wrap justify-between">
             <div className="flex gap-3 *:text-blue-600 *:cursor-pointer *:hover:text-blue-400 *:disabled:text-gray-400">
-                <button children={"<<"} onClick={handlePreviousPageGroup} disabled={page === 1} />
-                <button children={"< Anterior"} onClick={handlePreviousPage} disabled={page === 1} />
+                <button type="button" children={"<<"} onClick={handlePreviousPageGroup} disabled={page <= 1} />
+                <button type="button" children={"< Anterior"} onClick={handlePreviousPage} disabled={page <= 1} />
             </div>
 
             <div>
@@ -29,8 +29,8 @@ function Pagination({ page, totalPages, onChange: setPage }: PaginationProps) {
             </div>
 
             <div className="flex gap-3 *:text-blue-600 *:cursor-pointer *:hover:text-blue-400 *:disabled:text-gray-400">
-                <button children={"Próxima >"} onClick={handleNextPage} disabled={page === totalPages} />
-                <button children={">>"} onClick={handleNextPageGroup} disabled={page === totalPages} />
+                <button type="button" children={"Próxima >"} onClick={handleNextPage} disabled={page >= totalPages} />
+                <button type="button" children={">>"} onClick={handleNextPageGroup} disabled={page >= totalPages} />
             </div>
         </div>
     )

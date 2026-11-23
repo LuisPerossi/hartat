@@ -1,21 +1,30 @@
 import { MagnifyingGlassIcon } from "@phosphor-icons/react"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 interface SearchbarProps {
     onSearch: React.Dispatch<React.SetStateAction<string>>
 }
 
-function Searchbar({ onSearch: setSearch }: SearchbarProps)  {
+function Searchbar({ onSearch }: SearchbarProps)  {
     const [input, setInput] = useState("")
-    
+    const onSearchRef = useRef(onSearch)
+    const lastEmittedInputRef = useRef(input)
+
+    useEffect(() => {
+        onSearchRef.current = onSearch
+    }, [onSearch])
+
     //Debounces search
     useEffect(() => {
+        if (input === lastEmittedInputRef.current) return
+
         const timeout = setTimeout(() => {
-            setSearch(input)
+            lastEmittedInputRef.current = input
+            onSearchRef.current(input)
         }, 500)
 
         return () => clearTimeout(timeout)
-    }, [input, setSearch])
+    }, [input])
 
     return (
         <div className="relative flex flex-1 min-w-30 items-center">
