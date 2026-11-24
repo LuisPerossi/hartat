@@ -12,8 +12,19 @@ export class ImageController {
     public async upload(c: Context) {
         const body = await c.req.parseBody({ all: true })
 
-        const files = (Array.isArray(body.image) ? body.image : [ body.image ])
+        const images = (Array.isArray(body.image) ? body.image : [ body.image ])
             .filter((v): v is File => v instanceof File)
+        const thumbnails = (Array.isArray(body.thumbnail) ? body.thumbnail : [ body.thumbnail ])
+            .filter((v): v is File => v instanceof File)
+
+        if (images.length > 0 && thumbnails.length !== images.length) {
+            throw new BadRequestError('Each image must include a matching thumbnail')
+        }
+
+        const files = images.map((image, index) => ({
+            image,
+            thumbnail: thumbnails[index]
+        }))
 
         const { uploadedImages, failedImages } = await this.service.upload(files)
 

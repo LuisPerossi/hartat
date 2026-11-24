@@ -3,96 +3,86 @@ import { ImageRepository } from "../repository/ImageRepository";
 import { GetImages, UpdateImage } from "../schema/image.schema";
 import { NotFoundError } from "../error/NotFoundError";
 import { BadRequestError } from "../error/BadRequestError";
-import { PhotonImage, resize } from "@cf-wasm/photon";
 import { imageDimensionsFromStream } from "image-dimensions";
 import { FailedImage } from "@hartat/types/images";
 
 const VALID_TYPES = [ 'image/png', 'image/jpeg', 'image/webp' ]
-const MAX_FILE_SIZE = 5 * 1024 * 1024 //5Mb
+const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
+const MAX_THUMBNAIL_SIZE = 1 * 1024 * 1024 // 1MB
 const MAX_IMAGE_PIXELS = 1920 * 1920
-const THUMBNAIL_SIZE = 300
+const MAX_THUMBNAIL_PIXELS = 600 * 600
+
+export interface ImageUploadPair {
+    image: File
+    thumbnail: File
+}
 
 const createFailedImage = ({ name, type, size }: File, cause: string): FailedImage => ({ name, type, size, cause })
 
 export class ImageService {
     constructor(private readonly repository: ImageRepository) {}
 
-    private async generateThumbnail(image: File) {
-        try {
-            const input = await image.bytes()
-            const photonInput = PhotonImage.new_from_byteslice(input)
-
-            const originalWidth = photonInput.get_width()
-            const originalHeight = photonInput.get_height()
-
-            const ratio = Math.min(1, THUMBNAIL_SIZE / originalWidth, THUMBNAIL_SIZE / originalHeight)
-            const width = Math.round(originalWidth * ratio)
-            const height = Math.round(originalHeight * ratio)
-
-            const photonOutput = resize(photonInput, width, height, 5)
-            const bytes = photonOutput.get_bytes_webp()
-
-            photonInput.free()
-            photonOutput.free()
-
-            return new Blob([bytes], { type: 'image/webp' })
-        } catch {
-            return null
+    private async validateFile(file: File, maxSize: number, maxPixels: number, label: 'File' | 'Thumbnail') {
+        if (VALID_TYPES.includes(file.type) === false) {
+            return label === 'Thumbnail' ? 'Invalid thumbnail file type' : 'Invalid file type'
         }
+
+        if (file.size > maxSize) {
+            const limitMb = Math.round(maxSize / (1024 * 1024))
+            return `${label} size exceeds the ${limitMb}Mb limit`
+        }
+
+        const dimensions = await imageDimensionsFromStream(file.stream())
+
+        if (dimensions === undefined) {
+            return label === 'Thumbnail' ? 'Unable to read thumbnail image data' : 'Unable to read image data'
+        }
+
+        const totalPixels = dimensions.width * dimensions.height
+
+        if (totalPixels > maxPixels) {
+            return label === 'Thumbnail'
+                ? `Thumbnail dimensions exceed the ${maxPixels}px limit`
+                : `Image dimensions exceed the ${maxPixels}px limit`
+        }
+
+        return null
     }
 
-    public async upload(files: File[]) {
-        const images: File[] = []
-        const uploadedImages: Image[] = [] 
+    public async upload(files: ImageUploadPair[]) {
+        const validPairs: ImageUploadPair[] = []
+        const uploadedImages: Image[] = []
         const failedImages: FailedImage[] = []
 
-        //Validates image files with max 5Mb and 1920
-        for (const file of files) {
-            if (VALID_TYPES.includes(file.type) === false) {
-                failedImages.push(createFailedImage(file, 'Invalid file type'))
+        // Validates image + thumbnail pairs without heavy CPU/WASM processing
+        for (const pair of files) {
+            const imageError = await this.validateFile(pair.image, MAX_FILE_SIZE, MAX_IMAGE_PIXELS, 'File')
+            if (imageError) {
+                failedImages.push(createFailedImage(pair.image, imageError))
                 continue
             }
 
-            if (file.size > MAX_FILE_SIZE) {
-                failedImages.push(createFailedImage(file, 'File size exceeds the 5Mb limit' ))
+            const thumbnailError = await this.validateFile(pair.thumbnail, MAX_THUMBNAIL_SIZE, MAX_THUMBNAIL_PIXELS, 'Thumbnail')
+            if (thumbnailError) {
+                failedImages.push(createFailedImage(pair.image, thumbnailError))
                 continue
             }
 
-            const dimensions = await imageDimensionsFromStream(file.stream())
-
-            if (dimensions === undefined) {
-                failedImages.push(createFailedImage(file, 'Unable to read image data'))
-                continue
-            }
-
-            const totalPixels = dimensions.width * dimensions.height
-
-            if (totalPixels > MAX_IMAGE_PIXELS) {
-                failedImages.push(createFailedImage(file, `Image dimensions exceed the ${MAX_IMAGE_PIXELS}px limit`))
-                continue
-            }
-
-            images.push(file)
+            validPairs.push(pair)
         }
 
-        //If there are no valid images left, return
-        if (images.length === 0) { return { uploadedImages, failedImages }}
+        // If there are no valid images left, return
+        if (validPairs.length === 0) { return { uploadedImages, failedImages } }
 
-        if (images.length > 5) { throw new BadRequestError('Maximum of 5 images per upload') }
+        if (validPairs.length > 5) { throw new BadRequestError('Maximum of 5 images per upload') }
 
-        //Proceed with upload and storage
-        for (const image of images) {
+        // Proceed with upload and storage
+        for (const { image, thumbnail } of validPairs) {
+            const dotIndex = image.name.lastIndexOf('.')
             const data = {
-                key: crypto.randomUUID(), 
-                name: image.name.substring(0, image.name.lastIndexOf('.')),
-                extension: image.name.substring(image.name.lastIndexOf('.'))
-            }
-
-            const thumbnail = await this.generateThumbnail(image)
-
-            if (thumbnail === null) {
-                failedImages.push(createFailedImage(image, 'Unable to generate thumbnail'))
-                continue
+                key: crypto.randomUUID(),
+                name: dotIndex > 0 ? image.name.substring(0, dotIndex) : image.name,
+                extension: dotIndex > 0 ? image.name.substring(dotIndex) : '.webp'
             }
 
             const result = await this.repository.upload(image, thumbnail, data)

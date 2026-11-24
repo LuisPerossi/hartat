@@ -14,6 +14,7 @@
     "@hartat/types": "*",
     "@phosphor-icons/react": "^2.1.10",
     "@tailwindcss/vite": "^4.3.3",
+    "heic-to": "^1.6.7",
     "jszip": "^3.10.2",
     "quill": "^2.0.3",
     "quill-resize-module": "^2.1.3",

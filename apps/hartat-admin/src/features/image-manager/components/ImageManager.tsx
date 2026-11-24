@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { CheckIcon } from "@phosphor-icons/react"
+import { CheckIcon, WarningCircleIcon, XIcon } from "@phosphor-icons/react"
 
 import Searchbar from "@/components/Searchbar"
 import Pagination from "@/components/Pagination"
@@ -11,7 +11,7 @@ import ImageGrid from "./ImageGrid"
 import SelectionOptions from "./SelectionOptions"
 import DropZone from "./DropZone"
 
-import type { Image } from "@hartat/types/images"
+import type { FailedImage, Image } from "@hartat/types/images"
 import type { SortOrder } from "../types/images"
 
 import { uploadImages } from "../utils/images/upload"
@@ -36,6 +36,7 @@ function ImageManager({ onConfirmSelection, isModal = false, multiple = true }: 
     //Images and selection
     const [images, setImages] = useState<Image[]>([])
     const [selectedImages, setSelectedImages] = useState<Map<string, Image>>(new Map())
+    const [uploadErrors, setUploadErrors] = useState<FailedImage[]>([])
 
     //Forced reload
     const [forceReload, setForceReload] = useState(0)
@@ -87,23 +88,29 @@ function ImageManager({ onConfirmSelection, isModal = false, multiple = true }: 
 
     //Uploading images
     const handleUpload = async (files: File[]) => {
+        if (files.length === 0) return
+
         setIsLoading(true)
+        setUploadErrors([])
 
         try {
-            const result = await uploadImages({ files })
-            if (result === null) { return window.alert('Nenhum arquivo válido selecionado') }
-            
-            const { uploadedImages, failedImages } = result
+            const { uploadedImages, failedImages } = await uploadImages({ files })
 
             if (failedImages.length > 0) {
-                if (uploadedImages.length === 0) { throw new Error('Unable to upload images') }
-                else { window.alert('Algumas imagens não foram enviadas') }
+                setUploadErrors(failedImages)
             }
 
-            setForceReload(prev => prev + 1)
+            if (uploadedImages.length > 0) {
+                setForceReload(prev => prev + 1)
+            }
         } catch(err) {
             console.error(err)
-            window.alert('Erro ao enviar imagens')
+            setUploadErrors([{
+                name: 'Envio de imagens',
+                type: '',
+                size: 0,
+                cause: 'Ocorreu um erro inesperado ao enviar as imagens',
+            }])
         } finally {
             setIsLoading(false)
         }
@@ -147,6 +154,37 @@ function ImageManager({ onConfirmSelection, isModal = false, multiple = true }: 
                     <OrderSelect value={sortOrder} onChange={handleSortOrderChange} />
                 </div>
             </div>
+
+            { uploadErrors.length > 0 && (
+                <div
+                    role="alert"
+                    className="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800"
+                >
+                    <WarningCircleIcon className="mt-0.5 shrink-0 text-lg text-red-600" />
+                    <div className="min-w-0 flex-1">
+                        <p className="font-semibold">
+                            {uploadErrors.length === 1
+                                ? "1 imagem não pôde ser enviada:"
+                                : `${uploadErrors.length} imagens não puderam ser enviadas:`}
+                        </p>
+                        <ul className="mt-1 list-disc space-y-0.5 pl-4">
+                            {uploadErrors.map((failed, index) => (
+                                <li key={`${failed.name}-${index}`} className="wrap-break-word">
+                                    <span className="font-medium">{failed.name}</span> — {failed.cause}
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                    <button
+                        type="button"
+                        onClick={() => setUploadErrors([])}
+                        aria-label="Fechar aviso de erro"
+                        className="shrink-0 rounded-md p-1 text-red-600 transition-colors hover:bg-red-100 cursor-pointer"
+                    >
+                        <XIcon className="text-base" />
+                    </button>
+                </div>
+            ) }
 
             <DropZone onDrop={handleUpload}>
                 <ImageGrid 

@@ -13,8 +13,12 @@ export class ImageRepository {
 
     public async upload(image: Blob, thumbnail: Blob, data: CreateImage) {
         try {
-            await this.bucket.put(data.key, image)
-            await this.bucket.put(data.key + '_thumbnail', thumbnail)
+            await this.bucket.put(data.key, image, {
+                httpMetadata: { contentType: image.type || 'image/webp' }
+            })
+            await this.bucket.put(data.key + '_thumbnail', thumbnail, {
+                httpMetadata: { contentType: thumbnail.type || 'image/webp' }
+            })
 
             const result = await this.db.prepare(`
                 INSERT INTO
