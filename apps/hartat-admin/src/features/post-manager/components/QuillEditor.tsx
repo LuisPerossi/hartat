@@ -3,7 +3,7 @@ import Quill from "quill"
 import QuillResize from "quill-resize-module"
 import "quill/dist/quill.snow.css"
 import "quill-resize-module/dist/resize.css"
-import { API_URL } from "@/config/env"
+import { PUBLIC_API_URL } from "@/config/env"
 import type { Image } from "@hartat/types/images"
 import ImageSelectModal from "@/features/image-manager/components/ImageSelectModal"
 
@@ -144,7 +144,7 @@ function QuillEditor({ value, onChange, placeholder = "Escreva o conteúdo da po
         let insertIndex = range.index
 
         images.forEach((image) => {
-            const imageUrl = `${API_URL}/images/${image.key}`
+            const imageUrl = `${PUBLIC_API_URL}/images/${image.key}`
             quill.insertEmbed(insertIndex, "image", imageUrl, "user")
             insertIndex += 1
             quill.insertText(insertIndex, "\n", "user")

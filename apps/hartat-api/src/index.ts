@@ -7,17 +7,32 @@ import adminRouter from './router/admin.router'
 import { NotFoundError } from './error/NotFoundError'
 import { BadRequestError } from './error/BadRequestError'
 import { ValidationError } from './error/ValidationError'
+import { adminAuth } from './middleware/adminAuth'
 import { cors } from 'hono/cors'
 
 const app = new Hono<HonoEnv>()
 
-//Cors for local dev
-app.use(cors({ origin: "http://localhost:5173" }))
+// CORS configured via wrangler.jsonc vars (CORS_ORIGINS)
+app.use(cors({
+  origin: (origin, c) => {
+    const rawOrigins: string = c.env.CORS_ORIGINS ?? ''
+    const allowedOrigins = rawOrigins
+      .split(',')
+      .map((item) => item.trim())
+      .filter(Boolean)
+
+    return allowedOrigins.includes(origin) ? origin : ''
+  },
+  credentials: true,
+  allowMethods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
+  allowHeaders: ['Content-Type'],
+}))
 
 //Dependencies middleware
 app.use(dependencies)
 
-//Admin route
+//Admin route (protected by server-side secret + optional Cloudflare Access JWT)
+app.use('/admin/*', adminAuth)
 app.route('/admin', adminRouter)
 
 //Public route
