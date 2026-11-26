@@ -58,7 +58,7 @@ export function meta({}: Route.MetaArgs) {
 export async function loader({ context }: Route.LoaderArgs) {
   const { env } = context.get(cloudflareContext);
   const apiUrl = env.API_URL;
-  const api = createApiClient(apiUrl);
+  const api = createApiClient(apiUrl, env.API);
 
   let highlightedPosts: Post[] = [];
   try {

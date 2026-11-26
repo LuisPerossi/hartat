@@ -13,17 +13,21 @@ export class ApiError extends Error {
   }
 }
 
-export function createApiClient(baseUrl: string) {
+export function createApiClient(baseUrl: string, apiService?: Fetcher) {
   const normalizedBase = baseUrl.replace(/\/+$/, "");
 
   async function request<T>(path: string, init?: RequestInit): Promise<T> {
-    const res = await fetch(`${normalizedBase}${path}`, {
+    const requestInit: RequestInit = {
       ...init,
       headers: {
         Accept: "application/json",
         ...init?.headers,
       },
-    });
+    };
+
+    const res = apiService
+      ? await apiService.fetch(`https://hartat-api.internal${path}`, requestInit)
+      : await fetch(`${normalizedBase}${path}`, requestInit);
 
     if (!res.ok) {
       let message = res.statusText;

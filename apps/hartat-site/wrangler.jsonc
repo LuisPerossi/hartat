@@ -9,5 +9,11 @@
   "upload_source_maps": true,
   "vars": {
     "API_URL": "https://hartat-api.luispassoca.workers.dev"
-  }
+  },
+  "services": [
+    {
+      "binding": "API",
+      "service": "hartat-api"
+    }
+  ]
 }
