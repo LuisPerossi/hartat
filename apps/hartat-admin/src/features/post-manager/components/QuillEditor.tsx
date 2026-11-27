@@ -41,6 +41,19 @@ function QuillEditor({ value, onChange, placeholder = "Escreva o conteúdo da po
         const quill = new Quill(editorDiv, {
             theme: "snow",
             placeholder,
+            formats: [
+                "header",
+                "bold",
+                "italic",
+                "underline",
+                "strike",
+                "align",
+                "list",
+                "blockquote",
+                "link",
+                "image",
+                "width",
+            ],
             modules: {
                 toolbar: {
                     container: [
